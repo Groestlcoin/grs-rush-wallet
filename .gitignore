@@ -1,0 +1,6 @@
+node_modules
+uuid
+config/*.local.conf
+*.log
+logs/*.log
+/http/sencha/build

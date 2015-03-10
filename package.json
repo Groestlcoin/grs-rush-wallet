@@ -1,0 +1,24 @@
+{
+  "name": "groestlwallet",
+  "version": "0.0.1",
+  "author": {
+    "name": "Ashraful sharif",
+    "email": "sharif.ashraful@gmail.com"
+  },
+  "description": "groestlwallet -> rush",
+  "private": true,
+  "main" : "groestlwallet.js",
+  "scripts": {
+      "start": "node groestlwallet.js"
+  },
+  "dependencies": {
+    "zetta-app": "*",
+    "zetta-rpc" : "*",
+    "zetta-utils" : "*",
+    "zetta-utils": "*",
+    "underscore" : "*",
+    "cookie-signature" : "*",
+    "cookie" : "*",
+    "bitcoin": "*"
+  }
+}
