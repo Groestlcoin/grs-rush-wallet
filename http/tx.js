@@ -173,13 +173,17 @@ var TX = window.TX = new function ()
         {
             //serialize to Bitcoin Block Explorer format
             var buf = sendTx.serialize();
-            var hash = Bitcoin.Crypto.SHA256(Bitcoin.Crypto.SHA256(buf,
+            var hash = Bitcoin.convert.hexToBytes(Module.ccall('GroestlCoinHash', 'string', ['string'], [Bitcoin.convert.bytesToHex(buf)]));
+
+            /*var hash = Bitcoin.Crypto.SHA256(Bitcoin.Crypto.SHA256(buf,
             {
                 asBytes: true
             }),
             {
                 asBytes: true
-            });
+            });*/
+
+            console.log("BBE", hash)
 
             var r = {};
             r['hash'] = Bitcoin.convert.bytesToHex(hash.reverse());
