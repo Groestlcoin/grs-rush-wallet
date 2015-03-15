@@ -1,3 +1,8 @@
+/*
+ * @author : Ashraful Sharif <sharif.ashraful@gmail.com>
+ *
+ */
+
 var zapp 	= require("zetta-app");
 var http  	= require("http");
 var https  	= require("https");
@@ -31,6 +36,31 @@ function Groestlwallet() {
 	})
 
 	self.on('init::express', function() {	
+
+		// Send tx to grs client
+		self.app.post('/pushtx', function(req, res, next) {
+
+			var hexData = req.body.tx;
+
+			self.grsClient.sendRawTransaction(hexData, function(err, resp) {
+
+				console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxx")
+				console.log("error ", err)
+				console.log("resp", resp)
+				console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxx")
+
+				if( err ) {
+					return res.json( { error : err.toString( ) } );
+				} else {
+					return res.json( { tx : resp } );
+				}
+
+
+			})
+
+		})
+
+		// get the address balance 
 		self.app.get('/getBalance/:address', function(req, res, next) {
 
 			var address =    req.params.address; 
@@ -48,6 +78,7 @@ function Groestlwallet() {
 
 		})
 
+		// Get the tx info for the particular address
 		self.app.get('/txs/:address', function(req, res, next) {
 
 			var address =    req.params.address; 
@@ -67,6 +98,7 @@ function Groestlwallet() {
 
 		})
 
+		// Get unspent tx
 		self.app.get('/unspent/:address', function(req, res, next) {
 
 			var address =    req.params.address; 
@@ -84,6 +116,7 @@ function Groestlwallet() {
 
 		})
 
+		// Ticker data
 		self.app.get("/ticker", function(req, res, next) {
 
 			https.get('https://rushwallet.com/ticker2.php', function(response) {
@@ -113,9 +146,7 @@ function Groestlwallet() {
 				        });
 					})
 
-
 		        });
-
 
 		    });
 		})

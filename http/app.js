@@ -24,8 +24,6 @@ function txSetUnspent(text)
 {
     var r = JSON.parse(text);
     txUnspent = JSON.stringify(r, null, 4);
-    console.log("r" ,r)
-    console.log("txUnspent", txUnspent)
     rush.txUnspent = txUnspent;
     var address = rush.address;
     TX.parseInputs(txUnspent, address);
@@ -83,7 +81,7 @@ function txOnRemoveDest()
 function txSent(text)
 {
     //setMsg(text ? text : 'No response!');
-    if (/error/.test(text))
+    if ( text.error )
     {
         if (rush.counter < 3)
         {
@@ -118,7 +116,7 @@ function txSend()
 
     var tx = rush.txHex;
 
-    url = 'https://blockchain.info/pushtx?cors=true';
+    url = '/pushtx';
     postdata = 'tx=' + tx;
     //url = prompt(r + 'Send transaction:', url);
     if (url != null && url != "")
@@ -158,14 +156,12 @@ function txRebuild()
     }
 
     var eckey = new Bitcoin.Key(payload);
-
     eckey.setCompressed(compressed);
 
     TX.init(eckey);
 
     var fval = 0;
     var o = txGetOutputs();
-    console.log("o", o)
     for (i in o)
     {
         TX.addOutput(o[i].dest, o[i].fval);
@@ -185,7 +181,7 @@ function txRebuild()
         // console.log( "subtracting " + (bigBalance/1) + " - " + (bigfVal/1) + " - " + (bigFee/1) + " = " + (bigChange/1) );
         // var change = balance - fval - fee;
         change = bigChange / 100000000;
-        console.log(addr, change)
+        //onsole.log(addr, change)
         TX.addOutput(addr, change);
     }
     try

@@ -173,17 +173,14 @@ var TX = window.TX = new function ()
         {
             //serialize to Bitcoin Block Explorer format
             var buf = sendTx.serialize();
-            var hash = Bitcoin.convert.hexToBytes(Module.ccall('GroestlCoinHash', 'string', ['string'], [Bitcoin.convert.bytesToHex(buf)]));
-
-            /*var hash = Bitcoin.Crypto.SHA256(Bitcoin.Crypto.SHA256(buf,
+            
+            var hash = Bitcoin.Crypto.SHA256(Bitcoin.Crypto.SHA256(buf,
             {
                 asBytes: true
             }),
             {
                 asBytes: true
-            });*/
-
-            console.log("BBE", hash)
+            });        
 
             var r = {};
             r['hash'] = Bitcoin.convert.bytesToHex(hash.reverse());
@@ -368,7 +365,8 @@ function tx_parseBCI(data, address)
     for (var i in txs)
     {
         var o = txs[i];
-        var lilendHash = endian(o.tx_hash);
+
+        var lilendHash = o.tx_hash;//endian(o.tx_hash);
 
         //convert script back to BBE-compatible text
         var script = dumpScript(new Bitcoin.Script(Bitcoin.convert.hexToBytes(o.script)));
@@ -382,6 +380,7 @@ function tx_parseBCI(data, address)
         };
         balance = balance.add(value);
     }
+
     return {
         balance: balance,
         unspenttxs: unspenttxs
@@ -430,7 +429,7 @@ function parseTxs(data, address)
                 continue;
             var input = tx. in [b];
             var p = input.prev_out;
-            var lilendHash = endian(p.hash)
+            var lilendHash = p.hash;//endian(p.hash)
             // if this came from a transaction to our address...
             if (lilendHash in unspenttxs)
             {
