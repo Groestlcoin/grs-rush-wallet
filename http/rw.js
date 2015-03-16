@@ -69,6 +69,9 @@ rush = window.rush = {
 
         rush.getBalance();
 
+        // TODO.. NEED TO IMPLEMENT OWN WEB SOCKET
+
+        /*
         var socket = new WebSocket("wss://ws.blockchain.info/inv");
 
         socket.onopen = function (msg)
@@ -93,7 +96,7 @@ rush = window.rush = {
                 }
 
             }, 500);
-        }
+        }*/
 
         url = "https://rushwallet.com/?z=" + ( Math.floor(Math.random() * 9999999) + 1 ) + "#" + rush.passcode + "&{CODE}";
         url2="zxing://scan/?ret=" + encodeURIComponent( url ) + "&SCAN_FORMATS=QR";

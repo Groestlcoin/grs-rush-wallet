@@ -117,7 +117,7 @@ function txSend()
     var tx = rush.txHex;
 
     url = '/pushtx';
-    postdata = 'tx=' + tx;
+    postdata = 'tx=' + tx + '&address=' + txAddr;
     //url = prompt(r + 'Send transaction:', url);
     if (url != null && url != "")
     {

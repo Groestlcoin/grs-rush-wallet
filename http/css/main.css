@@ -252,26 +252,26 @@ a{color:#52B3EA}
 
 #fbShare
 {
-	background: url(img/fb-off.png);
+	background: url(/img/fb-off.png);
 	background-size: cover;
 }
 
 #fbShare:hover
 {
-	background: url(img/fb-on.png);
+	background: url(/img/fb-on.png);
 	background-size: cover;
 }
 
 #twitterShare
 {
-	background: url(img/twitter-off.png);
+	background: url(/img/twitter-off.png);
 	background-size: cover;
 	margin-right: 5px;
 }
 
 #twitterShare:hover
 {
-	background: url(img/twitter-on.png);
+	background: url(/img/twitter-on.png);
 	background-size: cover;
 }
 
@@ -296,25 +296,25 @@ a{color:#52B3EA}
 
 #choiceCurrency:hover .settingsChoiceIcon
 {
-	background: url(img/currency-on.png);
+	background: url(/img/currency-on.png);
 	background-size: cover;
 }
 
 #choiceCurrency .settingsChoiceIcon
 {
-	background: url(img/currency-off.png);
+	background: url(/img/currency-off.png);
 	background-size: cover;
 }
 
 #choiceSmartRequest:hover .settingsChoiceIcon
 {
-	background: url(img/smartrequest-on.png);
+	background: url(/img/smartrequest-on.png);
 	background-size: cover;
 }
 
 #choiceSmartRequest .settingsChoiceIcon
 {
-	background: url(img/smartrequest-off.png);
+	background: url(/img/smartrequest-off.png);
 	background-size: cover;
 	width: 58px;
 	margin-bottom: 10px;
@@ -323,13 +323,13 @@ a{color:#52B3EA}
 
 #choiceSmartFund:hover .settingsChoiceIcon
 {
-	background: url(img/smartfund-on.png);
+	background: url(/img/smartfund-on.png);
 	background-size: cover;
 }
 
 #choiceSmartFund .settingsChoiceIcon
 {
-	background: url(img/smartfund-off.png);
+	background: url(/img/smartfund-off.png);
 	background-size: cover;
 	height: 54px;
 	width: 44px;
@@ -338,7 +338,7 @@ a{color:#52B3EA}
 
 #choiceMining .settingsChoiceIcon
 {
-	background: url(img/miner-off.png);
+	background: url(/img/miner-off.png);
 	background-size: cover;
 }
 
@@ -832,14 +832,14 @@ background-repeat:repeat;
 	cursor: pointer;
 	width: 17px;
 	height: 17px;
-	background: url(img/settings-off.png);
+	background: url(/img/settings-off.png);
 	background-size: cover;
 	display: none;
 }
 
 #settings:hover
 {
-	background: url(img/settings-on.png);
+	background: url(/img/settings-on.png);
 	background-size: cover;
 }
 

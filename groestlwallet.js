@@ -9,6 +9,7 @@ var https  	= require("https");
 var util 	= require("util");
 var _ 		= require('underscore');
 var bitcoin = require("bitcoin");
+var BlockChain = require("./lib/blockchain")
 
 function Groestlwallet() {
 	var self = this;
@@ -16,6 +17,12 @@ function Groestlwallet() {
 
 	//http://localhost:4431/#kozndsp2K95y8Tbb4mdpJSOJAhrxwX
 	var key = "86d46f32e7ef";
+
+	/* 
+	 * pendingTx = { hash : { address : <address>, amount : <amount>, date : <date>} }
+	 *
+	 */
+	self.pendingTx = { };
 
 	self.init(function(cb) {
 		
@@ -32,6 +39,9 @@ function Groestlwallet() {
 		  console.log('Balance:', data);
 		});*/
 
+		self.blockchain = new BlockChain(self);
+		self.blockchain.start( );
+
 		cb();
 	})
 
@@ -41,6 +51,10 @@ function Groestlwallet() {
 		self.app.post('/pushtx', function(req, res, next) {
 
 			var hexData = req.body.tx;
+			var address = req.body.address
+
+			console.log( address )
+			return;
 
 			self.grsClient.sendRawTransaction(hexData, function(err, resp) {
 
@@ -91,7 +105,7 @@ function Groestlwallet() {
 		        response.on('end', function() {
 		        	body = body.substr(body.indexOf('"txs":'))
 		        	body = "{"+ body.substr(0, body.length-1) + "}";
-		        	console.log(body)
+		        	//console.log(body)
 		        	res.json( JSON.parse(body) );
 		        });
 			})
