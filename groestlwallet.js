@@ -19,7 +19,7 @@ function Groestlwallet() {
 	var key = "86d46f32e7ef";
 
 	/* 
-	 * pendingTx = { hash : { address : <address>, amount : <amount>, date : <date>} }
+	 * pendingTx = { address : [{ tx : <tx>, amount : <amount>, date : <date> }] }
 	 *
 	 */
 	self.pendingTx = { };
@@ -51,10 +51,7 @@ function Groestlwallet() {
 		self.app.post('/pushtx', function(req, res, next) {
 
 			var hexData = req.body.tx;
-			var address = req.body.address
-
-			console.log( address )
-			return;
+			var address = req.body.address			
 
 			self.grsClient.sendRawTransaction(hexData, function(err, resp) {
 
@@ -66,9 +63,23 @@ function Groestlwallet() {
 				if( err ) {
 					return res.json( { error : err.toString( ) } );
 				} else {
-					return res.json( { tx : resp } );
-				}
 
+					// Store Pending tx
+					self.blockchain.storePendingTx({
+						tx : resp,
+						address : address,
+						hexData : hexData
+					}, function( err, resp ) {
+
+						if(err) {
+							return res.json( { error : err.toString() } );
+						}
+
+						return res.json( { tx : resp } );
+
+					});
+					
+				}
 
 			})
 
@@ -92,20 +103,63 @@ function Groestlwallet() {
 
 		})
 
+		// get the unconfirmed tx  
+		self.app.get('/unconfirmed/:address', function(req, res, next) {
+
+			var address = req.params.address; 
+
+			res.json({ data : {
+				unconfirmed : self.pendingTx[address] || []
+			}});
+
+		})
+
 		// Get the tx info for the particular address
 		self.app.get('/txs/:address', function(req, res, next) {
 
 			var address =    req.params.address; 
 
 			http.get('http://chainz.cryptoid.info/grs/api.dws?q=multiaddr&key=' + key + '&active=' + address, function(response) {
+			  	
 			  	var body = '';
 		        response.on('data', function(d) {
 		            body += d;
 		        });
+
 		        response.on('end', function() {
+
 		        	body = body.substr(body.indexOf('"txs":'))
-		        	body = "{"+ body.substr(0, body.length-1) + "}";
-		        	//console.log(body)
+		        	body = "{" + body.substr(0, body.length-1) + "}";
+		        	
+		        	var txs = JSON.parse(body);
+		        	var txs = txs.txs;
+
+		        	for( var i in txs ) {
+
+		        		var tx = txs[i];
+		        		var pendingTx = self.pendingTx[address];
+		        		
+		        		if(pendingTx && pendingTx.length) {
+
+		        			for(var j in pendingTx) {
+		        						        				
+			        			if(pendingTx[j].tx == tx.hash) {
+			        				//console.log(">>>")
+			        				//console.log(pendingTx[j].tx, tx.hash)
+			        				pendingTx.splice(0, 1);
+			        			}
+
+			        		}
+
+
+			        		if( !self.pendingTx[address].length ) {
+			        			delete self.pendingTx[address];
+			        		}
+
+		        		}
+
+		        	}
+
 		        	res.json( JSON.parse(body) );
 		        });
 			})
