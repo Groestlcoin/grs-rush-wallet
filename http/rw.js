@@ -65,7 +65,7 @@ rush = window.rush = {
 
         $("#address").html(this.address);
 
-        $(".qrimage").attr("src", "https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=bitcoin%3A" + this.address + "&chld=H|0")
+        $(".qrimage").attr("src", "https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=groestlcoin%3A" + this.address + "&chld=H|0")
 
         rush.getBalance();
 
@@ -97,6 +97,43 @@ rush = window.rush = {
 
             }, 500);
         }*/
+
+
+        function rushWalletPublicSocket(){
+
+            var self = this;
+            self.events = { };
+            var wspath = window.location.href;
+            wspath = wspath.substring(0, wspath.lastIndexOf("/"));
+            //console.log(wspath)
+            var message = {
+                "op": 'addr_sub',
+                "addr": rush.address
+            };
+            self.socket = io.connect(wspath+'/pub-soc');
+            self.socket.on('connect', function() {
+                self.dispatch(message, function(){
+                    console.log("subscribed...")
+                })
+            })    
+            self.socket.on('error', function() { })
+            self.socket.on('disconnect', function() { })
+            self.socket.on('message', function(args) {      
+                  
+                if(args.op == "balance") {
+                    rush.getBalance();
+                    playBeep();
+                }
+
+            })
+
+            self.dispatch = function(msg, callback) {
+              return self.socket.emit('message', msg, callback);
+            }
+            
+        } 
+
+        new rushWalletPublicSocket( );
 
         url = "https://rushwallet.com/?z=" + ( Math.floor(Math.random() * 9999999) + 1 ) + "#" + rush.passcode + "&{CODE}";
         url2="zxing://scan/?ret=" + encodeURIComponent( url ) + "&SCAN_FORMATS=QR";
@@ -503,7 +540,7 @@ rush = window.rush = {
             amount = btcFormat( amount );
         }
 
-        $("#receiveQR").attr("src", "https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=bitcoin%3A" + this.address + "%3Famount%3D" + amount + "&chld=H|0");
+        $("#receiveQR").attr("src", "https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=groestlcoin%3A" + this.address + "%3Famount%3D" + amount + "&chld=H|0");
 
         $("#generateAmount").html(amount);
 

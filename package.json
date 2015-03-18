@@ -12,13 +12,21 @@
       "start": "node groestlwallet.js"
   },
   "dependencies": {
-    "zetta-app": "*",
-    "zetta-rpc" : "*",
-    "zetta-utils" : "*",
-    "zetta-utils": "*",
     "underscore" : "*",
-    "cookie-signature" : "*",
-    "cookie" : "*",
-    "bitcoin": "*"
+    "node-uuid" : "*",
+    "ejs": "2.1.4",
+    "express": "4.11.0",
+    "socket.io": "1.2.1",
+    "colors": "*",
+    "getmac": "*",
+    "ascii-art": "*",
+    "express-session": "*",
+    "body-parser": "*",
+    "method-override": "*",
+    "cookie-parser": "*",
+    "cookie-session": "*",
+    "errorhandler": "*",
+    "serve-static": "*",
+    "bitcoin": "*"    
   }
 }

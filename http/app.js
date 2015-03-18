@@ -83,16 +83,13 @@ function txSent(text)
     //setMsg(text ? text : 'No response!');
     if ( text.error )
     {
-        if (rush.counter < 3)
-        {
+        if (rush.counter < 3) {
             //     setTimeout(function () {
             //         txSend()
             //     }, 200);
 
             //     rush.counter++;
-        }
-        else
-        {
+        } else {
             rush.counter = 0;
             setMsg("There seems to be a problem with building the transaction. This in no way affects the safety of your Bitcoins.")
 
@@ -1422,13 +1419,13 @@ $(document).ready(function ()
     
     $("#price").hover( function ()
     {
-        $("#chartBox").stop(true);
-        rush.get24Chart();
+        //$("#chartBox").stop(true);
+        //rush.get24Chart();
 
     }, function ()
     {
-        $("#chartBox").stop(true);
-        $("#chartBox").slideUp();
+        //$("#chartBox").stop(true);
+        //$("#chartBox").slideUp();
     });
 
 

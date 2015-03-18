@@ -3,7 +3,7 @@
  *
  */
 
-var zapp 	= require("zetta-app");
+var app 	= require("./lib/application");
 var http  	= require("http");
 var https  	= require("https");
 var util 	= require("util");
@@ -13,7 +13,7 @@ var BlockChain = require("./lib/blockchain")
 
 function Groestlwallet() {
 	var self = this;
-	zapp.Application.apply(this, arguments);
+	app.Application.apply(this, arguments);
 
 	//http://localhost:4431/#kozndsp2K95y8Tbb4mdpJSOJAhrxwX
 	var key = "86d46f32e7ef";
@@ -45,7 +45,18 @@ function Groestlwallet() {
 		cb();
 	})
 
+
+	
+
 	self.on('init::express', function() {	
+
+
+		self.app.get('/', function(req, res, next){
+
+			var page = 'index.ejs';
+			
+			res.render( page );
+		})
 
 		// Send tx to grs client
 		self.app.post('/pushtx', function(req, res, next) {
@@ -222,7 +233,47 @@ function Groestlwallet() {
 
 		
 	})
+
+	//websocket initialization place
+	self.on('init::websockets', function() {
+
+		self.webSocketsPublic = self.io.of('/pub-soc').on('connection', function(socket) {
+            console.log("public-websocket "+socket.id+" connected");
+
+            self.webSocketMap[socket.id] = socket;            
+            socket.on('disconnect', function() {            
+                delete self.webSocketMap[socket.id];                
+                self.deleteAddSub( socket.id )
+                console.log("public-websocket " + socket.id + " disconnected");
+            })
+
+            socket.on('message', function(msg, callback) {
+	            try {	            	
+	                self.emit('websocket::'+msg.op, msg, callback, socket);
+	            }
+	            catch( ex ) { console.error(ex.stack); }
+	        });
+        });	
+	})
+
+	self.deleteAddSub = function( sid ) {
+
+		for(var i in self.addr_sub) {
+			if(self.addr_sub[i] == sid) {
+				delete self.addr_sub[i];
+				break;
+			}
+		}
+
+	}
+
+	self.addr_sub = {};
+
+	self.on('websocket::addr_sub', function(msg, callback, socket){
+		self.addr_sub[msg.addr] = socket.id;		
+		callback()
+	})
 }
 
-util.inherits(Groestlwallet, zapp.Application);
-GLOBAL.zettaApp = new Groestlwallet(__dirname);
+util.inherits(Groestlwallet, app.Application);
+GLOBAL.groestlwallet = new Groestlwallet(__dirname);
