@@ -26,13 +26,7 @@ function Groestlwallet() {
 
 	self.init(function(cb) {
 		
-		self.grsClient = new bitcoin.Client({
-			host: '127.0.0.1',
-			port: 1441,
-			user: 'u',
-			pass: 'p',
-			timeout: 30000
-		});
+		self.grsClient = new bitcoin.Client(self.config.grsqt);
 
 		/*grsClient.cmd('getinfo', function(err, data){
 		  if (err) return console.log(err);
