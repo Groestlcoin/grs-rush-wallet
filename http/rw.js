@@ -652,7 +652,7 @@ rush = window.rush = {
             //for ( i in msg.data.txs )
             for ( i=0;i<msg.txs.length;i++ )
             {
-                txTime = "TODO by rpc"//moment( msg.data.txs[i].time_utc ).format( "MMM D YYYY [<span class='time'>]h:mma[</span>]" );
+                txTime = moment( msg.txs[i].time_utc ).format( "MMM D YYYY [<span class='time'>]h:mma[</span>]" );
 
                 $("#txTable tbody").append( '<tr><td>' + txTime + '</td><td class="hidden-sm hidden-xs"><a href="https://chainz.cryptoid.info/grs/tx.dws?' + msg.txs[i].hash + '.htm" target="_blank" >' + msg.txs[i].hash.substring(0,30) + '...</a></td><td class="hidden-sm hidden-xs">' +  formatMoney( msg.txs[i].confirmations || 0 ) + '</td><td>' + btcFormat( msg.txs[i].change/1e8 ) + '</td></tr>' );
             }
