@@ -697,7 +697,7 @@ $(document).ready(function ()
         entroMouse.mouseInside = true;
     }); 
 
-    $(document).on("click", '#changeType', function (e)
+   /*$(document).on("click", '#changeType', function (e)
     {
         if ( $("#changeType .addonBox").html() != "฿" )
         {
@@ -735,7 +735,7 @@ $(document).ready(function ()
             if ( !mobilecheck() )
                 $("#txtReceiveAmount").focus();
         }
-    });
+    });*/
 
     $(document).on("mouseleave", '#tapBox', function (e)
     {
