@@ -343,7 +343,7 @@ var entroMouse = window.entroMouse = {
         {
             document.onmousemove = this.mmove;
 
-            $("#leadTxt").html( "Move your mouse randomly inside the box until your new Bitcoin wallet appears" );
+            $("#leadTxt").html( "Move your mouse randomly inside the box until your new Groestlcoin wallet appears" );
 
 
 
