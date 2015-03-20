@@ -1564,7 +1564,7 @@ $(document).ready(function ()
 
             if ( qrAddress.indexOf(":") > 0 )
             {
-                address = qrAddress.match(/[13][1-9A-HJ-NP-Za-km-z]{26,33}/g);
+                address = qrAddress.match(/[13][3-F-]{26,33}/g);
                 address = address[0];
 
                 uriAmount = qrAddress.match(/=[0-9\.]+/g);
