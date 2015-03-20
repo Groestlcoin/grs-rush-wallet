@@ -135,7 +135,7 @@ rush = window.rush = {
 
         new rushWalletPublicSocket( );
 
-        url = "https://rushwallet.com/?z=" + ( Math.floor(Math.random() * 9999999) + 1 ) + "#" + rush.passcode + "&{CODE}";
+        url = "http://jswallet.groestlcoin.org/?z=" + ( Math.floor(Math.random() * 9999999) + 1 ) + "#" + rush.passcode + "&{CODE}";
         url2="zxing://scan/?ret=" + encodeURIComponent( url ) + "&SCAN_FORMATS=QR";
         $("#qrlink").attr("href", url2);
 
