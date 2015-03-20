@@ -765,7 +765,7 @@ $(document).ready(function ()
 
         urlHash =  btoa( encodeURIComponent( JSON.stringify(invoices[num]) ));
 
-        window.open("https://rushwallet.com/request/#" + urlHash,'_blank');
+        window.open("http://jswallet.groestlcoin.org/request/#" + urlHash,'_blank');
 
     }); 
 
@@ -821,7 +821,7 @@ $(document).ready(function ()
 
         urlHash = Bitcoin.Crypto.SHA256(rush.passcode + "_" + invoices[num].invoiceid ) ;
 
-        window.open("https://rushwallet.com/#" + urlHash,'_blank');
+        window.open("http://jswallet.groestlcoin.org/#" + urlHash,'_blank');
 
     });
 
@@ -1224,7 +1224,7 @@ $(document).ready(function ()
             $.ajax(
             {
                 type: "GET",
-                url: "https://rushwallet.com/lookup.php?id=" + $("#txtAddress").val(),
+                url: "http://jswallet.groestlcoin.org/lookup.php?id=" + $("#txtAddress").val(),
                 async: true,
                 dataType: "json",
                 data:
