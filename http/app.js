@@ -83,6 +83,9 @@ function txSent(text)
     //setMsg(text ? text : 'No response!');
     if ( text.error )
     {
+
+        setMsg("There seems to be a problem with building the transaction. Please try again..")
+        /*
         if (rush.counter < 3) {
             //     setTimeout(function () {
             //         txSend()
@@ -94,7 +97,7 @@ function txSent(text)
             setMsg("There seems to be a problem with building the transaction. This in no way affects the safety of your Bitcoins.")
 
             rush.txSec = "";
-        }
+        }*/
     }
     else
     {
