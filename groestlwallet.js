@@ -232,7 +232,7 @@ function Groestlwallet() {
 	self.on('init::websockets', function() {
 
 		self.webSocketsPublic = self.io.of('/pub-soc').on('connection', function(socket) {
-            //console.log("public-websocket "+socket.id+" connected");
+            console.log("public-websocket "+socket.id+" connected");
 
             self.webSocketMap[socket.id] = socket;            
             socket.on('disconnect', function() {            

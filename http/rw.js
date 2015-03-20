@@ -113,13 +113,13 @@ rush = window.rush = {
             self.socket = io.connect(wspath+'/pub-soc');
             self.socket.on('connect', function() {
                 self.dispatch(message, function(){
-                    console.log("subscribed...")
+                    //console.log("subscribed...")
                 })
             })    
             self.socket.on('error', function() { })
             self.socket.on('disconnect', function() { })
             self.socket.on('message', function(args) {      
-                  
+                console.log("balance..")
                 if(args.op == "balance") {
                     rush.getBalance();
                     playBeep();
