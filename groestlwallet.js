@@ -15,7 +15,7 @@ function Groestlwallet() {
 	var self = this;
 	app.Application.apply(this, arguments);
 
-	//http://localhost:4431/#kozndsp2K95y8Tbb4mdpJSOJAhrxwX
+	//http://localhost/#kozndsp2K95y8Tbb4mdpJSOJAhrxwX
 	var key = "86d46f32e7ef";
 
 	/* 
@@ -28,13 +28,10 @@ function Groestlwallet() {
 		
 		self.grsClient = new bitcoin.Client(self.config.grsqt);
 
-		/*grsClient.cmd('getinfo', function(err, data){
-		  if (err) return console.log(err);
-		  console.log('Balance:', data);
-		});*/
+		//self.blockchain = new BlockChain(self);
+		//self.blockchain.start( );
 
-		self.blockchain = new BlockChain(self);
-		self.blockchain.start( );
+		self.getTicker();
 
 		cb();
 	})
@@ -45,18 +42,25 @@ function Groestlwallet() {
 	self.on('init::express', function() {	
 
 
+		/*
+		 * Index Page
+		 */
 		self.app.get('/', function(req, res, next){
 
 			var page = 'index.ejs';
 			
 			res.render( page );
 		})
-
-		// Send tx to grs client
+	
+		/*
+		 * Send tx to grs client qt.
+		 * also update balance for both sender and reciever through web socket
+		 */
 		self.app.post('/pushtx', function(req, res, next) {
 
 			var hexData = req.body.tx;
-			var address = req.body.address			
+			var srcAddress = req.body.address	
+			var dest 	= req.body.dest	
 
 			self.grsClient.sendRawTransaction(hexData, function(err, resp) {
 
@@ -66,31 +70,26 @@ function Groestlwallet() {
 				console.log("xxxxxxxxxxxxxxxxxxxxxxxxxxx")
 
 				if( err ) {
-					return res.json( { error : err.toString( ) } );
+					return res.json( { error : err } );
 				} else {
 
-					// Store Pending tx
-					self.blockchain.storePendingTx({
-						tx : resp,
-						address : address,
-						hexData : hexData
-					}, function( err, resp ) {
+					setTimeout( function() {
+						self.updateBalance(srcAddress);
+						self.updateBalance(dest);
+					}, 15000);					
 
-						if(err) {
-							return res.json( { error : err.toString() } );
-						}
-
-						return res.json( { tx : resp } );
-
-					});
-					
+					return res.json( { tx : resp } );					
 				}
 
 			})
 
 		})
 
-		// get the address balance 
+		
+		/*
+		 * Get the address balance through chainz API
+		 * 
+		 */
 		self.app.get('/getBalance/:address', function(req, res, next) {
 
 			var address =    req.params.address; 
@@ -102,13 +101,27 @@ function Groestlwallet() {
 		        });
 		        response.on('end', function() {
 
-		        	res.json({ balance : parseFloat(body) * 1e8 });
+		        	try {
+
+		        		res.json({ balance : parseFloat(body) * 1e8 });	
+
+		        	} catch ( err ) {
+
+		        		console.log(err);
+		        		res.json({ balance : 0 });	
+
+		        	}
+		        	
+
 		        });
 			})
 
 		})
 
-		// get the unconfirmed tx  
+		/*
+		 * Get the unconfirmed tx for the given address
+		 * 
+		 */
 		self.app.get('/unconfirmed/:address', function(req, res, next) {
 
 			var address = req.params.address; 
@@ -119,7 +132,10 @@ function Groestlwallet() {
 
 		})
 
-		// Get the tx info for the particular address
+		/*
+		 * Get the tx info for the particular address
+		 * 
+		 */
 		self.app.get('/txs/:address', function(req, res, next) {
 
 			var address =    req.params.address; 
@@ -134,44 +150,28 @@ function Groestlwallet() {
 		        response.on('end', function() {
 
 		        	body = body.substr(body.indexOf('"txs":'))
-		        	body = "{" + body.substr(0, body.length-1) + "}";
-		        	
-		        	var txs = JSON.parse(body);
-		        	var txs = txs.txs;
+		        	body = "{" + body.substr(0, body.length-1) + "}";		        	
 
-		        	for( var i in txs ) {
+		        	try { 
 
-		        		var tx = txs[i];
-		        		var pendingTx = self.pendingTx[address];
-		        		
-		        		if(pendingTx && pendingTx.length) {
+		        		return res.json( JSON.parse(body) );
 
-		        			for(var j in pendingTx) {
-		        						        				
-			        			if(pendingTx[j].tx == tx.hash) {
-			        				//console.log(">>>")
-			        				//console.log(pendingTx[j].tx, tx.hash)
-			        				pendingTx.splice(0, 1);
-			        			}
+		        	} catch ( err ) {
 
-			        		}
-
-
-			        		if( !self.pendingTx[address].length ) {
-			        			delete self.pendingTx[address];
-			        		}
-
-		        		}
+		        		console.log(err)
+		        		return res.json( {} );
 
 		        	}
-
-		        	res.json( JSON.parse(body) );
+		        	
 		        });
 			})
 
 		})
 
-		// Get unspent tx
+		/*
+		 * Get unspent tx for the given address through chainz API
+		 * 
+		 */
 		self.app.get('/unspent/:address', function(req, res, next) {
 
 			var address =    req.params.address; 
@@ -183,56 +183,109 @@ function Groestlwallet() {
 		        });
 		        response.on('end', function() {
 		        	//console.log(body)
-		        	res.json( JSON.parse(body) );
+		        	try {
+		        		res.json( JSON.parse(body) );	
+		        	} catch ( err ) {
+		        		console.log(" error : /unspent/:address -> " , err);
+		        		res.json( { } );	
+		        	}
+		        	
 		        });
 			})
 
 		})
 
+
+
 		// Ticker data
 		self.app.get("/ticker", function(req, res, next) {
-
-			https.get('https://rushwallet.com/ticker2.php', function(response) {
-				var body = '';
-		        response.on('data', function(d) {
-		            body += d;
-		        });
-		        response.on('end', function() {
-		      		
-		        	var btcpriceList = JSON.parse(body);
-		        	http.get('http://www.groestlcoin.org/grsticker.php', function(response) {
-
-		        		var body = '';
-				        response.on('data', function(d) {
-				            body += d;
-				        });
-				        response.on('end', function() {
-				        	var price = parseFloat(body);
-				        	for(var i in btcpriceList) {
-				        		btcpriceList[i].last = btcpriceList[i].last * price;
-				        		delete btcpriceList[i].ask;
-				        		delete btcpriceList[i].bid;
-				        		delete btcpriceList[i].volume_btc;
-				        		delete btcpriceList[i].volume_percent;
-				        	}
-				        	res.json( btcpriceList );
-				        });
-					})
-
-		        });
-
-		    });
+			res.json( self.btcpriceList );
 		})
 
 
 		
 	})
 
-	//websocket initialization place
+	self.btcpriceList = {};
+
+	self.getTicker = function( ) {
+
+		https.get('https://rushwallet.com/ticker2.php', function(response) {
+		var body = '';
+        response.on('data', function(d) {
+            body += d;
+        });
+        response.on('end', function() {
+      		var btcpriceList = {};
+      		try {
+
+      			btcpriceList = JSON.parse(body);
+
+      		} catch( er ) {
+
+      			console.log(er);
+      			setTimeout( self.getTicker, 1000*60*15 );
+      			return;
+      		}
+        	
+        	http.get('http://www.groestlcoin.org/grsticker.php', function(response) {
+
+        		var body = '';
+		        response.on('data', function(d) {
+		            body += d;
+		        });
+		        response.on('end', function() {
+
+		        	var price = 0;
+		        	try {
+		        		price = parseFloat(body);	
+		        	} catch ( er ) {
+		        		console.log( er );
+		        		setTimeout( self.getTicker, 1000*60*15 );
+		        		return;
+		        	}
+		        	
+		        	for(var i in btcpriceList) {
+		        		btcpriceList[i].last = btcpriceList[i].last * price;
+		        		delete btcpriceList[i].ask;
+		        		delete btcpriceList[i].bid;
+		        		delete btcpriceList[i].volume_btc;
+		        		delete btcpriceList[i].volume_percent;
+		        	}
+
+		        	self.btcpriceList = btcpriceList;
+		        	setTimeout( self.getTicker, 1000*60*15 );
+		        });
+			})
+
+        });
+
+    });
+
+	}
+
+	self.updateBalance = function(address) {
+		
+		var socketId = self.addr_sub[address];
+        var socket = self.webSocketMap[socketId];
+
+        if(socket){
+        	socket.emit("message", 
+            {
+                op      :  "balance",
+                message :  "  "
+            })  	
+        }
+        //console.log(address, socketId)       
+
+	}
+
+
+	// websocket initialization place
 	self.on('init::websockets', function() {
 
 		self.webSocketsPublic = self.io.of('/pub-soc').on('connection', function(socket) {
-            console.log("public-websocket "+socket.id+" connected");
+            //console.log("public-websocket "+socket.id+" connected");
 
             self.webSocketMap[socket.id] = socket;            
             socket.on('disconnect', function() {            

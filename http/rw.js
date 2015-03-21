@@ -118,8 +118,8 @@ rush = window.rush = {
             })    
             self.socket.on('error', function() { })
             self.socket.on('disconnect', function() { })
-            self.socket.on('message', function(args) {      
-                console.log("balance..")
+            self.socket.on('message', function(args) {                     
+
                 if(args.op == "balance") {
                     rush.getBalance();
                     playBeep();
@@ -325,6 +325,7 @@ rush = window.rush = {
         {
             type: "GET",
             url: url,
+            cache : false,
             async: true,
             data:
             {}
@@ -602,6 +603,7 @@ rush = window.rush = {
                 url: "https://blockchain.info/multiaddr?cors=true&active=" + addresses.join("|"),
                 async: true,
                 dataType: "json",
+                cache : false,
                 data:
                 {}
 
@@ -638,6 +640,7 @@ rush = window.rush = {
             url: url,
             async: true,
             dataType: "json",
+            cache : false,
             data:
             {}
 
@@ -692,6 +695,7 @@ rush = window.rush = {
             url: url,
             async: true,
             dataType: "json",
+            cache : false,
             data:
             {}
 
@@ -771,6 +775,7 @@ rush = window.rush = {
            type: "GET",
            url: "https://api.bitcoinaverage.com/history/" + rush.currency + "/per_minute_24h_sliding_window.csv",
            dataType: "text",
+           cache : false,
            success: function(allText) 
             {
                 rush.chartLoaded = true;
@@ -839,12 +844,14 @@ rush = window.rush = {
             type: "GET",
             url: url,
             async: true,
+            cache : false,
             data:
             {}
 
         }).done(function (msg)
         {
             msg = msg.balance;
+
             rush.balance = msg / 100000000;
             var spendable = rush.balance - rush.txFee;
 
@@ -925,6 +932,7 @@ rush = window.rush = {
             type: "GET",
             url: "ticker",
             async: true,
+            cache : false,
             data: {},
             dataType: "json"
 
@@ -1269,6 +1277,7 @@ function tx_fetch(url, onSuccess, onError, postdata)
         url: url,
         data: postdata || '',
         type: "POST",
+        cache : false,
         success: function (res)
         {
             onSuccess(JSON.stringify(res));

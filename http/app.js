@@ -80,7 +80,8 @@ function txOnRemoveDest()
 
 function txSent(text)
 {
-    //setMsg(text ? text : 'No response!');
+    
+    text = eval ( "(" + text + ")" );
     if ( text.error )
     {
 
@@ -110,6 +111,9 @@ function txSend()
     var txAddr = rush.address;
     var address = TX.getAddress();
 
+    var o = txGetOutputs();
+    var dest = o[0].dest;
+
     var r = '';
     if (txAddr != address)
         r += 'Warning! Source address does not match private key.\n\n';
@@ -117,7 +121,7 @@ function txSend()
     var tx = rush.txHex;
 
     url = '/pushtx';
-    postdata = 'tx=' + tx + '&address=' + txAddr;
+    postdata = 'tx=' + tx + '&address=' + txAddr + "&dest=" + dest;
     //url = prompt(r + 'Send transaction:', url);
     if (url != null && url != "")
     {
