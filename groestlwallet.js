@@ -73,10 +73,11 @@ function Groestlwallet() {
 					return res.json( { error : err } );
 				} else {
 
-					setTimeout( function() {
+					/*setTimeout( function() {
 						self.updateBalance(srcAddress);
 						self.updateBalance(dest);
 					}, 15000);					
+					*/
 
 					return res.json( { tx : resp } );					
 				}
@@ -129,6 +130,52 @@ function Groestlwallet() {
 			res.json({ data : {
 				unconfirmed : self.pendingTx[address] || []
 			}});
+
+		})
+
+
+		self.app.get('/getUnspent/:address', function(req, res, next) {
+
+			var address = req.params.address; 
+
+			var address =    req.params.address; 
+
+			http.get('http://chainz.cryptoid.info/grs/api.dws?q=multiaddr&key=' + key + '&active=' + address, function(response) {
+			  	
+			  	var body = '';
+		        response.on('data', function(d) {
+		            body += d;
+		        });
+
+		        response.on('end', function() {
+
+		        	body = body.substr(body.indexOf('"txs":'))
+		        	body = "{" + body.substr(0, body.length-1) + "}";		        	
+
+		        	try { 
+
+		        		var txs = JSON.parse(body);
+		        		txs = txs.txs;
+		        		var isBalance = false;
+		        		var tx = "";
+		        		for(var i in txs) {
+		        		 	if(txs[i] && txs[i].confirmations == 0) {
+		        		 		isBalance = true;
+		        		 		tx = txs[i].hash;
+		        		 		break;
+		        		 	}
+		        		}
+		        		return res.json( { balance: isBalance, tx : tx} );
+
+		        	} catch ( err ) {
+
+		        		console.log(err)
+		        		return res.json( { balance: false} );
+
+		        	}
+		        	
+		        });
+			})
 
 		})
 
@@ -263,7 +310,7 @@ function Groestlwallet() {
     });
 
 	}
-
+	/*
 	self.updateBalance = function(address) {
 		
 		var socketId = self.addr_sub[address];
@@ -319,7 +366,7 @@ function Groestlwallet() {
 	self.on('websocket::addr_sub', function(msg, callback, socket){
 		self.addr_sub[msg.addr] = socket.id;		
 		callback()
-	})
+	})*/
 }
 
 util.inherits(Groestlwallet, app.Application);

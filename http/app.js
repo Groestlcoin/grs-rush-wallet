@@ -19,6 +19,43 @@ function txGetUnspent()
     }
 }
 
+var preunconfirmed = "";
+function checkForBalance () {
+
+    var addr = rush.address;
+
+    var url = '/getUnspent/' + addr;
+
+    $.ajax(
+    {
+        type: "GET",
+        url: url,
+        async: true,
+        dataType: "json",
+        cache : false,
+        data:
+        {}
+
+    }).done(function (msg)
+    {
+        if(msg.balance) {
+
+            if(msg .tx && preunconfirmed != msg.tx) {
+
+                rush.getBalance();
+                playBeep();    
+                preunconfirmed = msg.tx;
+
+            }
+            
+        }   
+
+        setTimeout(checkForBalance, 8000)
+    });
+}
+
+setTimeout(checkForBalance, 1000)
+
 
 function txSetUnspent(text)
 {
@@ -80,7 +117,7 @@ function txOnRemoveDest()
 
 function txSent(text)
 {
-    
+
     text = eval ( "(" + text + ")" );
     if ( text.error )
     {
