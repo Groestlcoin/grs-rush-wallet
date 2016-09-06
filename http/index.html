@@ -4,8 +4,8 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Rushwallet | Get your Bitcoin wallet </title>
-	<meta name="description" content="RushWallet is an instant cross-platform bitcoin wallet, controlled by you.">
+    <title>Groestlcoin JSwallet | Get your Groestlcoin wallet </title>
+	<meta name="description" content="GroestlCoin JSwallet is an instant cross-platform Groestlcoin wallet, controlled by you.">
     <!-- Bootstrap -->
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/main.css?v=15" rel="stylesheet">
@@ -27,11 +27,8 @@
 <body>
     <nav class="banner navbar navbar-default navbar-fixed-top" role="navigation">
         <div class="container">
-            <a class="brand" href="index.html">
-                <img src="img/logo.png" alt="" style="margin-top: -4px; width: 129px;">
-            </a>
-            <a class="KKBrand" href="http://kryptokit.com/" target="_blank">
-            	by Kryptokit
+            <a class="brand" href="/">
+                <img src="img/progress_lock.png" alt="" style="margin-top: -4px; width: 35px; height: 35px;"> <span style="color:#6590a2"> <b> Groestlcoin JSwallet</b></span>
             </a>
             <div id="priceBox">
                 <div id="price"></div>
@@ -51,7 +48,7 @@
 				<!-- <button class="" id="passBtn"> <span class="hl">Create wallet with password</span> <span class="glyphicon"></span></button> -->
 
 
-				<div id="leadTxt">Drag your finger randomly inside the box until your new Bitcoin wallet appears</div>
+				<div id="leadTxt">Drag your finger randomly inside the box until your new Groestlcoin wallet appears</div>
 
 
 				<div id="passBox">
@@ -76,8 +73,8 @@
 					</div>
 
                     <div id="progressLockBox">
-                        <div id="progressFill"></div>
-                        <img src="img/progress_lock.png" alt="" id="progressLockImg" class="tapBox" width="236">
+                        <div id="progressFill" ></div>
+                        <img style="background-color:transparent;" src="img/progress_lock.png" alt="" id="progressLockImg" class="tapBox" width="236">
                     </div>
 
                 </div>
@@ -120,7 +117,7 @@
     	<div id="saveURL"><div>Make sure you bookmark this page to access your wallet in the future</div></div>
 
     	<div id="addressBox">
-    	    <div id="addressTxt">Your Bitcoin Address</div>
+    	    <div id="addressTxt">Your Groestlcoin Address</div>
     	    <span id="address"></span>
 
     	</div>
@@ -131,7 +128,7 @@
                     <div id="leftInfo">
                         <div id="walletName"></div>
                         <div class="balance">
-                            ฿<span id="btcBalance"></span>
+                            &#484; <span id="btcBalance"></span>
                         </div>
                         <div class="currency">
                             <span id="currencyValue">USD</span> <span id="fiatValue"></span>
@@ -164,7 +161,7 @@
 
                     <div class="input-group">
                         <!-- <span class="input-group-addon"><i class="fa fa-bitcoin"></i></span>-->
-                        <span class="input-group-addon" id="changeType2"><span class="glyphicon glyphicon-sort"></span> <span class="addonBox2">฿</span> </span>
+                        <span class="input-group-addon" id="changeType2"><!--span class="glyphicon glyphicon-sort"></span--> <span class="addonBox2">&#484;</span> </span>
 
                         <input class="form-control" placeholder="Amount" id="txtReceiveAmount" type="text" autocapitalize="off" autocorrect="off">
                         <span class="input-group-btn">
@@ -200,7 +197,7 @@
                 </div>
                 <div class="form-group">
                     <div class="input-group">
-                        <span class="input-group-addon" id="changeType"><span class="glyphicon glyphicon-sort"></span> <span class="addonBox">฿</span> </span>
+                        <span class="input-group-addon" id="changeType"><!--span class="glyphicon glyphicon-sort"></span--> <span class="addonBox">&#484;</span> </span>
 
                         <input class="form-control" placeholder="Amount" id="txtAmount" type="text" autocapitalize="off" autocorrect="off">
                         <span class="input-group-btn">
@@ -267,38 +264,30 @@
 			                		</div>
 			                		Help
 			                	</div>
-                                <div id="infoLogo"><img src="img/logo.png" alt=""></div>
-			                	<div class="infoText">RushWallet is an instant cross-platform bitcoin wallet. By not requiring annoying logins and passwords, RushWallet makes bitcoin simple to setup and easy to use.</div>
+                                <div id="infoLogo"> <img src="img/progress_lock.png" alt="" style="margin-top: -4px; width: 35px; height: 35px;"> <span style="color:#6590a2"> <b>Groestlcoin JSwallet </b></span></div>
+			                	<div class="infoText">Groestlcoin JSwallet is an instant cross-platform Groestlcoin wallet. By not requiring annoying logins and passwords, Groestlcoin JSwallet makes Groestlcoin simple to setup and easy to use.</div>
 
-			                	<div class="infoTitle">Only you have control of your wallet and bitcoins </div>
-			                	<div class="infoText">RushWallet neither holds nor has access to your bitcoins or private keys. All information is stored on the client-side, so only you have control of your wallet and your bitcoins.</div>
+			                	<div class="infoTitle">Only you have control of your wallet and groestlcoin </div>
+			                	<div class="infoText">Groestlcoin JSwallet neither holds nor has access to your groestlcoin or private keys. All information is stored on the client-side, so only you have control of your wallet and your Groestlcoin.</div>
 
 			                	<div class="infoTitle">Your URL is Your Key</div>
-			                	<div class="infoText">Bookmark your wallet’s secret URL to access your RushWallet in the future. Please note, this is your private URL so do not share it with anyone. <b>If you lose this URL your bitcoins will be lost forever.</b></div>
+			                	<div class="infoText">Bookmark your walletâ€™s secret URL to access your Groestlcoin JSwallet in the future. Please note, this is your private URL so do not share it with anyone. <b>If you lose this URL your Groestlcoin will be lost forever.</b></div>
 
 			                	<div class="infoTitle">Add a password for extra security</div>
-			                	<div class="infoText">When creating your RushWallet we offer the option to add a password to your account. You will need to enter this password every time you access your wallet. For your own security we do not store any customer data, so <strong>don’t forget your password!</strong><br/><br/>
-								<i>Please note, all transactions sent from your wallet include a .0001 mining fee. This fee helps support the bitcoin network and ensures your transaction goes through quickly.</i>
+			                	<div class="infoText">When creating your Groestlcoin JSwallet we offer the option to add a password to your account. You will need to enter this password every time you access your wallet. For your own security we do not store any customer data, so <strong>donâ€™t forget your password!</strong><br/><br/>
+								<i>Please note, all transactions sent from your wallet include a 0.0001 mining fee. This fee helps support the Groestlcoin network and ensures your transaction goes through quickly.</i>
 			                	</div>
-
 			                	<div class="infoTitle">Max send feature</div>
 			                	<div class="infoText">Type "max" or "all" in the send amount field to see the maximum amount you can send from your wallet.</div>
 								
+								<div class="infoTitle">Groestlcoin Price Indicator</div>
+			                	<div class="infoText">The Groestlcoin price shown in the top header is the <a href="http://bittrex.com/" target="_blank">Bittrex.com</a> price shown in USD.</div>
 
-								<div class="infoTitle">Bitcoin Price Indicator</div>
-			                	<div class="infoText">The bitcoin price shown in the top header is the <a href="http://bitcoinaverage.com/" target="_blank">Bitcoinaverage.com</a> price shown in USD.</div>
-
-			                	<div class="infoTitle">OneName Feature</div>
-			                	<div class="infoText">Rushwallet integrates with OneName, the Bitcoin user name registration service, for simple address lookups. Simply type in a OneName registered name when sending BTC from RushWallet and the address field will automatically populate.  For more information and to claim your Bitcoin user name please visit <a href="http://onename.io/" target="_blank">OneName.io</a>.</div>
-
-                                <div class="infoTitle">What is a RushWallet Fundraiser?</div>
-                                <div class="infoText">This RushWallet tool allows you to raise funds for your crowd-funding initiative or to pool money together from multiple people.</div>
-
-                                <div class="infoTitle">What is a RushWallet Payment Request?</div>
-                                <div class="infoText">This RushWallet tool allows you to easily create and manage requests for payments. </div>
+                                <div class="infoTitle">What is a Groestlcoin JSwallet Payment Request?</div>
+                                <div class="infoText">This Groestlcoin JSwallet tool allows you to easily create and manage requests for payments. </div>
                                 
 			                	<div class="infoTitle">Contact Us</div>
-			                	<div class="infoText"><a href="mailto:rush@kryptokit.com" style="color: #F49500;">rush@kryptokit.com</a></div>
+			                	<div class="infoText"><a href="mailto:groestlcoin@gmail.com" style="color: #F49500;">groestlcoin@gmail.com</a></div>
 
 
 			                </div>
@@ -326,7 +315,7 @@
 	                        		Receive
 	                        	</div>
 
-	                        	<p>Requesting <span id="generateAmount"></span> BTC to:
+	                        	<p>Requesting <span id="generateAmount"></span> GRS to:
 	                        	    <br>
 	                        	    <small><span id="generateAddress"></span></small>
 	                        	</p>
@@ -335,7 +324,7 @@
                                 <!-- <a id="invoiceLinkReceive">Create a SmartRequest</a> <span class="glyphicon glyphicon-question-sign" id="requestHelp"></span> -->
 
                                 <div id="requestHelpText">
-                                    <p>SmartRequest is a decentralized Bitcoin payment request system.</p>
+                                    <p>SmartRequest is a decentralized Groestlcoin payment request system.</p>
     
                                     It can be used to raise funds as a crowdfunding initiative, to pool money together from multiple people, or to create a simple invoice for services rendered.
                                 </div>
@@ -418,13 +407,13 @@
                                     </div>    
                                     <div class="clearfix"></div> 
 
-                                    <div class="modalTitle">
+                                    <!--div class="modalTitle">
                                         
                                         Tools <span class="betaTag">Beta</span>
 
-                                    </div>   
+                                    </div-->   
 
-                                    <div class="settingsChoice" id="choiceSmartRequest">
+                                    <!--div class="settingsChoice" id="choiceSmartRequest">
                                         <div class="settingsChoiceIcon"></div>
                                         <div class="settingsChoiceText">Payment Request<br/>Manager</div>
                                     </div>   
@@ -434,7 +423,7 @@
                                         <div class="settingsChoiceText">Fundraiser <br/>Manager</div>
                                     </div>         
 
-                                    <div class="clearfix"></div> 
+                                    <div class="clearfix"></div--> 
                    
                                 </div>
 
@@ -492,7 +481,7 @@
                                        
                                         <label>Amount Requested</label>
                                         <div class="input-group">
-                                            <span class="input-group-addon">฿</span>
+                                            <span class="input-group-addon">Ç¤</span>
                                             <input class="form-control" placeholder="Amount" id="txtInvoiceAmount" type="text" autocapitalize="off" autocorrect="off">
                                         </div>
 
@@ -557,7 +546,7 @@
                                 </div>
 
                                 <div id="settingsMining">
-                                    <div id="settingsMiningInfo">RushWallet transactions are free of charge. However, sending too little or no mining fee can greatly impact the speed at which your transactions are confirmed. You may change the fee below to alter the default mining fee.</div>
+                                    <div id="settingsMiningInfo">Groestlcoin JSWallet transactions are free of charge. However, sending too little or no mining fee can greatly impact the speed at which your transactions are confirmed. You may change the fee below to alter the default mining fee.</div>
                                     
                                     <div class="break"></div>
                                     <div class="miningOption">
@@ -577,7 +566,7 @@
                                             <div class="settingsOption" type="normal"></div>
                                             <div class="settingsOptionText">Normal</div>
                                         </div>
-                                        <div class="miningOptionRight"> The miner fee policy suggested by the standard bitcoin client will be used. <span class="blueText">Recommended.</span></div>
+                                        <div class="miningOptionRight"> The miner fee policy suggested by the standard Groestlcoin client will be used. <span class="blueText">Recommended.</span></div>
                                         <div class="clearfix"></div>
                                     </div>
 
@@ -588,7 +577,7 @@
                                             <div class="settingsOption" type="generous"></div>
                                             <div class="settingsOptionText">Generous</div>
                                         </div>
-                                        <div class="miningOptionRight">A miner fee of 0.0005 BTC will be used as to  ensure your transactions are processed quickly.</div>
+                                        <div class="miningOptionRight">A miner fee of 0.02 GRS will be used as to  ensure your transactions are processed quickly.</div>
                                         <div class="clearfix"></div>
                                     </div>
 
@@ -603,7 +592,7 @@
                                             Set a custom miner fee.
                                             <div class="form-group" id="feeHolder">
                                                 <div class="input-group">
-                                                    <span class="input-group-addon">฿</span>
+                                                    <span class="input-group-addon">Ç¤</span>
 
                                                     <input class="form-control" placeholder="Miner Fee" id="txtFeeAmount" type="text" autocapitalize="off" autocorrect="off">
                                                 
@@ -645,7 +634,7 @@
 			                <div class="modalBox" id="confirmBox">
 			                	
 								<p>Confirm that you are sending</p>
-			                	<p id="confirmAmountLine"><span id="confirmAmount"></span> (BTC)</p>
+			                	<p id="confirmAmountLine"><span id="confirmAmount"></span> (GRS)</p>
 			                	<p>to the following address</p>
 			                	<div id="confirmAddress"></div>
 		                	    <small><span id="generateAddress"></span></small>
