@@ -1,14 +1,3 @@
-/*
-  tx.js - Bitcoin transactions for JavaScript (public domain)
-
-  Obtaining inputs:
-  1) http://blockchain.info/unspent?address=<address>
-  2) http://blockexplorer.com/q/mytransactions/<address>
-
-  Sending transactions:
-  1) http://bitsend.rowit.co.uk
-  2) http://www.blockchain.info/pushtx
-*/
 
 var TX = window.TX = new function ()
     {
@@ -171,7 +160,7 @@ var TX = window.TX = new function ()
 
         this.toBBE = function (sendTx)
         {
-            //serialize to Bitcoin Block Explorer format
+            //serialize to Groestlcoin Block Explorer format
             var buf = sendTx.serialize();
             
             var hash = Bitcoin.Crypto.SHA256(Bitcoin.Crypto.SHA256(buf,
@@ -239,7 +228,7 @@ var TX = window.TX = new function ()
 
         this.fromBBE = function (text)
         {
-            //deserialize from Bitcoin Block Explorer format
+            //deserialize from Groestlcoin Block Explorer format
             var sendTx = new Bitcoin.Transaction();
             var r = JSON.parse(text);
             if (!r)
@@ -313,8 +302,6 @@ function dumpScript(script)
     return out.join(' ');
 }
 
-// blockr.io parser 
-// uses http://btc.blockr.io/api/v1/address/unspent/<address>
 function tx_parseBlockr(data, address)
 {
     var r = JSON.parse(data);
@@ -349,8 +336,7 @@ function tx_parseBlockr(data, address)
     };
 }
 
-// blockchain.info parser (adapted)
-// uses http://blockchain.info/unspent?address=<address>
+
 function tx_parseBCI(data, address)
 {
     var r = JSON.parse(data);
