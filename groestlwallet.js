@@ -1,8 +1,3 @@
-/*
- * @author : Ashraful Sharif <sharif.ashraful@gmail.com>
- *
- */
-
 var app 	= require("./lib/application");
 var http  	= require("http");
 var https  	= require("https");
