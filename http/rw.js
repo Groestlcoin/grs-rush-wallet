@@ -195,7 +195,7 @@ rush = window.rush = {
 
         if (amount > this.balance)
         {
-            setMsg("You are trying to send more BTC than you have in your balance!");
+            setMsg("You are trying to send more GRS than you have in your balance!");
             return false;
         }
         
@@ -207,7 +207,7 @@ rush = window.rush = {
 
         if (total > this.balance)
         {
-            setMsg("You need to leave enough room for the " + this.txFee + " btc miner fee");
+            setMsg("You need to leave enough room for the " + this.txFee + " grs miner fee");
             return false;
         }
 
