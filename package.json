@@ -2,8 +2,8 @@
   "name": "groestlwallet",
   "version": "0.0.1",
   "author": {
-    "name": "Ashraful sharif",
-    "email": "sharif.ashraful@gmail.com"
+    "name": "Groestlcoin Developers",
+    "email": "groestlcoin@gmail.com"
   },
   "description": "groestlwallet -> rush",
   "private": true,
