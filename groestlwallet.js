@@ -36,11 +36,15 @@ function Groestlwallet() {
 
 	self.on('init::express', function() {	
 
-
+		var cors = require('cors');
+		self.app.use(cors());
+		
 		/*
 		 * Index Page
 		 */
 		self.app.get('/', function(req, res, next){
+			res.header("Access-Control-Allow-Origin", "*");
+			res.header("Access-Control-Allow-Headers", "X-Requested-With");
 
 			var page = 'index.ejs';
 			
@@ -52,6 +56,8 @@ function Groestlwallet() {
 		 * also update balance for both sender and reciever through web socket
 		 */
 		self.app.post('/pushtx', function(req, res, next) {
+			res.header("Access-Control-Allow-Origin", "*");
+			res.header("Access-Control-Allow-Headers", "X-Requested-With");
 
 			var hexData = req.body.tx;
 			var srcAddress = req.body.address	
@@ -87,6 +93,8 @@ function Groestlwallet() {
 		 * 
 		 */
 		self.app.get('/getBalance/:address', function(req, res, next) {
+			res.header("Access-Control-Allow-Origin", "*");
+			res.header("Access-Control-Allow-Headers", "X-Requested-With");
 
 			var address =    req.params.address; 
 
@@ -119,6 +127,8 @@ function Groestlwallet() {
 		 * 
 		 */
 		self.app.get('/unconfirmed/:address', function(req, res, next) {
+			res.header("Access-Control-Allow-Origin", "*");
+			res.header("Access-Control-Allow-Headers", "X-Requested-With");
 
 			var address = req.params.address; 
 
@@ -130,6 +140,8 @@ function Groestlwallet() {
 
 
 		self.app.get('/getUnspent/:address', function(req, res, next) {
+			res.header("Access-Control-Allow-Origin", "*");
+			res.header("Access-Control-Allow-Headers", "X-Requested-With");
 
 			var address = req.params.address; 
 
@@ -179,6 +191,8 @@ function Groestlwallet() {
 		 * 
 		 */
 		self.app.get('/txs/:address', function(req, res, next) {
+			res.header("Access-Control-Allow-Origin", "*");
+			res.header("Access-Control-Allow-Headers", "X-Requested-With");
 
 			var address =    req.params.address; 
 
@@ -215,6 +229,8 @@ function Groestlwallet() {
 		 * 
 		 */
 		self.app.get('/unspent/:address', function(req, res, next) {
+			res.header("Access-Control-Allow-Origin", "*");
+			res.header("Access-Control-Allow-Headers", "X-Requested-With");
 
 			var address =    req.params.address; 
 
@@ -241,6 +257,9 @@ function Groestlwallet() {
 
 		// Ticker data
 		self.app.get("/ticker", function(req, res, next) {
+			res.header("Access-Control-Allow-Origin", "*");
+			res.header("Access-Control-Allow-Headers", "X-Requested-With");
+
 			res.json( self.btcpriceList );
 		})
 
