@@ -19,8 +19,8 @@ rush = window.rush = {
     "useFiat": false,
     "useFiat2": false,
     "firstTime":false,
-    "currency": "BTCUSD",
-    "currencyOptions": ["BTCCNY","BTCEUR","BTCGBP","BTCJPY","BTCRUB","BTCUSD"],
+    "currency": "USD",
+    "currencyOptions": ["CNY","EUR","GBP","JPY","RUB","USD"],
     "sweeping":"",
     "getBalanceBlock": false,
     "chartLoaded": false,
@@ -875,17 +875,17 @@ rush = window.rush = {
     {
         switch ( this.currency )
         {
-            case "BTCUSD":
+            case "USD":
 		  return "$";
-            case "BTCCNY":
+            case "CNY":
                 return "Â¥";            
-            case "BTCEUR":
+            case "EUR":
                 return "â‚¬";            
-            case "BTCGBP":
+            case "GBP":
                 return "Â£";            
-            case "BTCJPY":
+            case "JPY":
                 return "Â¥";
-            case "BTCRUB":
+            case "RUB":
                 return "Ñ€ÑƒÐ± ";            
 
             default:
