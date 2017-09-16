@@ -16,12 +16,11 @@ rush = window.rush = {
     "gpgKeys": Array(),
     "gpgPage": Array(),
     "price": 0,
-    "currency": "USD",
     "useFiat": false,
     "useFiat2": false,
     "firstTime":false,
-    "currency": "USD",
-    "currencyOptions": ["AUD","BRL","CAD","CHF","CNY","DKK","EUR","GBP","HKD","INR", "ISK", "JPY","KRW","NZD","PLN","RUB","SEK","SGD","THB","TWD","USD","ZAR"],
+    "currency": "BTCUSD",
+    "currencyOptions": ["BTCCNY","BTCEUR","BTCGBP","BTCJPY","BTCRUB","BTCUSD"],
     "sweeping":"",
     "getBalanceBlock": false,
     "chartLoaded": false,
@@ -861,7 +860,7 @@ rush = window.rush = {
                 spendable = 0;
 
             $("#btcBalance").html( btcFormat( rush.balance ) );
-            $("#spendable").html("฿" + btcFormat( spendable ) );
+            $("#spendable").html("à¸¿" + btcFormat( spendable ) );
 
             rush.getFiatPrice();
 
@@ -876,43 +875,18 @@ rush = window.rush = {
     {
         switch ( this.currency )
         {
-            case "AUD":
-            case "USD":
-            case "CAD":
-            case "CLP":
-            case "HKD":
-            case "NZD":
-            case "SGD":
-                return "$";
-                break;
-            case "BRL":
-                return "R$"; 
-            case "CNY":
-                return "¥";            
-            case "DKK":
-                return "kr";
-            case "EUR":
-                return "€";            
-            case "GBP":
-                return "£";            
-            case "INR":
-                return "";
-            case "ISK":
-                return "kr";            
-            case "JPY":
-                return "¥";
-            case "KRW":
-                return "₩";            
-            case "PLN":
-                return "zł";
-            case "RUB":
-                return "руб ";            
-            case "SEK":
-                return "kr ";
-            case "TWD":
-                return "NT$";
-            case "THB":
-                return "T฿";
+            case "BTCUSD":
+		  return "$";
+            case "BTCCNY":
+                return "Â¥";            
+            case "BTCEUR":
+                return "â‚¬";            
+            case "BTCGBP":
+                return "Â£";            
+            case "BTCJPY":
+                return "Â¥";
+            case "BTCRUB":
+                return "Ñ€ÑƒÐ± ";            
 
             default:
                 return "$";
@@ -976,7 +950,7 @@ rush = window.rush = {
         {
             var btcValue = amount / this.price;
             btcValue = btcFormat( btcValue );
-            $("#fiatPrice").html("(฿" + btcValue + ")");
+            $("#fiatPrice").html("(à¸¿" + btcValue + ")");
 
         }
         else
@@ -1006,7 +980,7 @@ rush = window.rush = {
         {
             var btcValue = amount / this.price;
             btcValue = btcFormat( btcValue );
-            $("#fiatPrice2").html("(฿" + btcValue + ")");
+            $("#fiatPrice2").html("(à¸¿" + btcValue + ")");
 
         }
         else
