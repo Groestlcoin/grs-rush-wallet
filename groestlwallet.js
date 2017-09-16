@@ -307,11 +307,9 @@ function Groestlwallet() {
 		        	}
 		        	
 		        	for(var i in btcpriceList) {
-		        		btcpriceList[i].last = btcpriceList[i].last * price;
-		        		delete btcpriceList[i].ask;
-		        		delete btcpriceList[i].bid;
-		        		delete btcpriceList[i].volume_btc;
-		        		delete btcpriceList[i].volume_percent;
+		        		btcpriceList[i].last = btcpriceList[i].last * price;		        		
+					delete btcpriceList[i].averages;
+		        		delete btcpriceList[i].timestamp;
 		        	}
 
 		        	self.btcpriceList = btcpriceList;
