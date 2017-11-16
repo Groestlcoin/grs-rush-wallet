@@ -16,11 +16,12 @@ rush = window.rush = {
     "gpgKeys": Array(),
     "gpgPage": Array(),
     "price": 0,
+    "currency": "USD",
     "useFiat": false,
     "useFiat2": false,
     "firstTime":false,
     "currency": "USD",
-    "currencyOptions": ["CNY","EUR","GBP","JPY","RUB","USD"],
+    "currencyOptions": ["AUD","BRL","CAD","CHF","CNY","DKK","EUR","GBP","HKD","INR", "ISK", "JPY","KRW","NZD","PLN","RUB","SEK","SGD","THB","TWD","USD","ZAR"],
     "sweeping":"",
     "getBalanceBlock": false,
     "chartLoaded": false,
@@ -875,18 +876,43 @@ rush = window.rush = {
     {
         switch ( this.currency )
         {
+            case "AUD":
             case "USD":
-		  return "$";
+            case "CAD":
+            case "CLP":
+            case "HKD":
+            case "NZD":
+            case "SGD":
+                return "$";
+                break;
+            case "BRL":
+                return "R$"; 
             case "CNY":
                 return "Â¥";            
+            case "DKK":
+                return "kr";
             case "EUR":
                 return "â‚¬";            
             case "GBP":
                 return "Â£";            
+            case "INR":
+                return "";
+            case "ISK":
+                return "kr";            
             case "JPY":
                 return "Â¥";
+            case "KRW":
+                return "â‚©";            
+            case "PLN":
+                return "zÅ‚";
             case "RUB":
                 return "Ñ€ÑƒÐ± ";            
+            case "SEK":
+                return "kr ";
+            case "TWD":
+                return "NT$";
+            case "THB":
+                return "Tà¸¿";
 
             default:
                 return "$";
