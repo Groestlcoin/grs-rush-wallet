@@ -50,11 +50,11 @@ function checkForBalance () {
             
         }   
 
-        setTimeout(checkForBalance, 8000)
+        setTimeout(checkForBalance, 800)
     });
 }
 
-setTimeout(checkForBalance, 1000)
+setTimeout(checkForBalance, 100)
 
 
 function txSetUnspent(text)
@@ -741,11 +741,11 @@ $(document).ready(function ()
         entroMouse.mouseInside = true;
     }); 
 
-   /*$(document).on("click", '#changeType', function (e)
+   $(document).on("click", '#changeType', function (e)
     {
-        if ( $("#changeType .addonBox").html() != "฿" )
+        if ( $("#changeType .addonBox").html() != "G" )
         {
-            $("#changeType .addonBox").html("฿");
+            $("#changeType .addonBox").html("G");
             rush.useFiat = false;
             rush.amountFiatValue();
             if ( !mobilecheck() )
@@ -763,9 +763,9 @@ $(document).ready(function ()
 
     $(document).on("click", '#changeType2', function (e)
     {
-        if ( $("#changeType2 .addonBox2").html() != "฿" )
+        if ( $("#changeType2 .addonBox2").html() != "G" )
         {
-            $("#changeType2 .addonBox2").html("฿");
+            $("#changeType2 .addonBox2").html("G");
             rush.useFiat2 = false;
             rush.amountFiatValue2();
             if ( !mobilecheck() )
@@ -779,7 +779,7 @@ $(document).ready(function ()
             if ( !mobilecheck() )
                 $("#txtReceiveAmount").focus();
         }
-    });*/
+    });
 
     $(document).on("mouseleave", '#tapBox', function (e)
     {
