@@ -743,9 +743,9 @@ $(document).ready(function ()
 
    $(document).on("click", '#changeType', function (e)
     {
-        if ( $("#changeType .addonBox").html() != "G" )
+        if ( $("#changeType .addonBox").html() != "Ç¤" )
         {
-            $("#changeType .addonBox").html("G");
+            $("#changeType .addonBox").html("Ç¤");
             rush.useFiat = false;
             rush.amountFiatValue();
             if ( !mobilecheck() )
@@ -763,9 +763,9 @@ $(document).ready(function ()
 
     $(document).on("click", '#changeType2', function (e)
     {
-        if ( $("#changeType2 .addonBox2").html() != "G" )
+        if ( $("#changeType2 .addonBox2").html() != "Ç¤" )
         {
-            $("#changeType2 .addonBox2").html("G");
+            $("#changeType2 .addonBox2").html("Ç¤");
             rush.useFiat2 = false;
             rush.amountFiatValue2();
             if ( !mobilecheck() )
