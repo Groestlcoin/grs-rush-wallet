@@ -50,11 +50,11 @@ function checkForBalance () {
             
         }   
 
-        setTimeout(checkForBalance, 800)
+        setTimeout(checkForBalance, 8000)
     });
 }
 
-setTimeout(checkForBalance, 100)
+setTimeout(checkForBalance, 1000)
 
 
 function txSetUnspent(text)
