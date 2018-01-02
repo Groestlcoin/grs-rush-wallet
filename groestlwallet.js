@@ -3,8 +3,8 @@ var http  	= require("http");
 var https  	= require("https");
 var util 	= require("util");
 var _ 		= require('underscore');
-var bitcoin = require("bitcoin");
-var BlockChain = require("./lib/blockchain")
+var bitcoin     = require("bitcoin");
+var BlockChain  = require("./lib/blockchain")
 
 function Groestlwallet() {
 	var self = this;
@@ -98,7 +98,7 @@ function Groestlwallet() {
 
 			var address =    req.params.address; 
 
-			http.get('http://chainz.cryptoid.info/grs/api.dws?q=getbalance&key=' + key + '&a=' + address, function(response) {
+			https.get('https://chainz.cryptoid.info/grs/api.dws?q=getbalance&key=' + key + '&a=' + address, function(response) {
 			  	var body = '';
 		        response.on('data', function(d) {
 		            body += d;
@@ -147,7 +147,7 @@ function Groestlwallet() {
 
 			var address =    req.params.address; 
 
-			http.get('http://chainz.cryptoid.info/grs/api.dws?q=multiaddr&key=' + key + '&active=' + address, function(response) {
+			https.get('https://chainz.cryptoid.info/grs/api.dws?q=multiaddr&key=' + key + '&active=' + address, function(response) {
 			  	
 			  	var body = '';
 		        response.on('data', function(d) {
@@ -196,7 +196,7 @@ function Groestlwallet() {
 
 			var address =    req.params.address; 
 
-			http.get('http://chainz.cryptoid.info/grs/api.dws?q=multiaddr&key=' + key + '&active=' + address, function(response) {
+			https.get('https://chainz.cryptoid.info/grs/api.dws?q=multiaddr&key=' + key + '&active=' + address, function(response) {
 			  	
 			  	var body = '';
 		        response.on('data', function(d) {
@@ -215,8 +215,7 @@ function Groestlwallet() {
 		        	} catch ( err ) {
 
 		        		console.log(err)
-		        		return res.json( {} );
-
+					return res.json( {} );
 		        	}
 		        	
 		        });
@@ -234,7 +233,7 @@ function Groestlwallet() {
 
 			var address =    req.params.address; 
 
-			http.get('http://chainz.cryptoid.info/grs/api.dws?q=unspent&key=' + key + '&active=' + address, function(response) {
+			https.get('https://chainz.cryptoid.info/grs/api.dws?q=unspent&key=' + key + '&active=' + address, function(response) {
 			  	var body = '';
 		        response.on('data', function(d) {
 		            body += d;
@@ -271,7 +270,7 @@ function Groestlwallet() {
 
 	self.getTicker = function( ) {
 
-		http.get('http://www.groestlcoin.org/ticker2.php', function(response) {
+		https.get('https://www.groestlcoin.org/ticker2.php', function(response) {
 		var body = '';
         response.on('data', function(d) {
             body += d;
@@ -289,7 +288,7 @@ function Groestlwallet() {
       			return;
       		}
         	
-        	http.get('http://www.groestlcoin.org/grsticker.php', function(response) {
+        	https.get('https://www.groestlcoin.org/grsticker.php', function(response) {
 
         		var body = '';
 		        response.on('data', function(d) {
