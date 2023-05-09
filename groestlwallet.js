@@ -270,7 +270,7 @@ function Groestlwallet() {
 
 	self.getTicker = function( ) {
 
-		https.get('https://www.groestlcoin.org/ticker2.php', function(response) {
+		http.get('http://www.groestlcoin.org/ticker2.php', function(response) {
 		var body = '';
         response.on('data', function(d) {
             body += d;
