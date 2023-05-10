@@ -13,14 +13,14 @@ function Groestlwallet() {
 	//http://localhost/#kozndsp2K95y8Tbb4mdpJSOJAhrxwX
 	var key = "86d46f32e7ef";
 
-	/* 
+	/*
 	 * pendingTx = { address : [{ tx : <tx>, amount : <amount>, date : <date> }] }
 	 *
 	 */
 	self.pendingTx = { };
 
 	self.init(function(cb) {
-		
+
 		self.grsClient = new bitcoin.Client(self.config.grsqt);
 
 		//self.blockchain = new BlockChain(self);
@@ -32,13 +32,13 @@ function Groestlwallet() {
 	})
 
 
-	
 
-	self.on('init::express', function() {	
+
+	self.on('init::express', function() {
 
 		var cors = require('cors');
 		self.app.use(cors());
-		
+
 		/*
 		 * Index Page
 		 */
@@ -47,10 +47,10 @@ function Groestlwallet() {
 			res.header("Access-Control-Allow-Headers", "X-Requested-With");
 
 			var page = 'index.ejs';
-			
+
 			res.render( page );
 		})
-	
+
 		/*
 		 * Send tx to grs client qt.
 		 * also update balance for both sender and reciever through web socket
@@ -60,8 +60,8 @@ function Groestlwallet() {
 			res.header("Access-Control-Allow-Headers", "X-Requested-With");
 
 			var hexData = req.body.tx;
-			var srcAddress = req.body.address	
-			var dest 	= req.body.dest	
+			var srcAddress = req.body.address
+			var dest 	= req.body.dest
 
 			self.grsClient.sendRawTransaction(hexData, function(err, resp) {
 
@@ -77,26 +77,26 @@ function Groestlwallet() {
 					/*setTimeout( function() {
 						self.updateBalance(srcAddress);
 						self.updateBalance(dest);
-					}, 15000);					
+					}, 15000);
 					*/
 
-					return res.json( { tx : resp } );					
+					return res.json( { tx : resp } );
 				}
 
 			})
 
 		})
 
-		
+
 		/*
 		 * Get the address balance through chainz API
-		 * 
+		 *
 		 */
 		self.app.get('/getBalance/:address', function(req, res, next) {
 			res.header("Access-Control-Allow-Origin", "*");
 			res.header("Access-Control-Allow-Headers", "X-Requested-With");
 
-			var address =    req.params.address; 
+			var address =    req.params.address;
 
 			https.get('https://chainz.cryptoid.info/grs/api.dws?q=getbalance&key=' + key + '&a=' + address, function(response) {
 			  	var body = '';
@@ -107,15 +107,15 @@ function Groestlwallet() {
 
 		        	try {
 
-		        		res.json({ balance : parseFloat(body) * 1e8 });	
+		        		res.json({ balance : parseFloat(body) * 1e8 });
 
 		        	} catch ( err ) {
 
 		        		console.log(err);
-		        		res.json({ balance : 0 });	
+		        		res.json({ balance : 0 });
 
 		        	}
-		        	
+
 
 		        });
 			})
@@ -124,13 +124,13 @@ function Groestlwallet() {
 
 		/*
 		 * Get the unconfirmed tx for the given address
-		 * 
+		 *
 		 */
 		self.app.get('/unconfirmed/:address', function(req, res, next) {
 			res.header("Access-Control-Allow-Origin", "*");
 			res.header("Access-Control-Allow-Headers", "X-Requested-With");
 
-			var address = req.params.address; 
+			var address = req.params.address;
 
 			res.json({ data : {
 				unconfirmed : self.pendingTx[address] || []
@@ -143,12 +143,12 @@ function Groestlwallet() {
 			res.header("Access-Control-Allow-Origin", "*");
 			res.header("Access-Control-Allow-Headers", "X-Requested-With");
 
-			var address = req.params.address; 
+			var address = req.params.address;
 
-			var address =    req.params.address; 
+			var address =    req.params.address;
 
 			https.get('https://chainz.cryptoid.info/grs/api.dws?q=multiaddr&key=' + key + '&active=' + address, function(response) {
-			  	
+
 			  	var body = '';
 		        response.on('data', function(d) {
 		            body += d;
@@ -157,9 +157,9 @@ function Groestlwallet() {
 		        response.on('end', function() {
 
 		        	body = body.substr(body.indexOf('"txs":'))
-		        	body = "{" + body.substr(0, body.length-1) + "}";		        	
+		        	body = "{" + body.substr(0, body.length-1) + "}";
 
-		        	try { 
+		        	try {
 
 		        		var txs = JSON.parse(body);
 		        		txs = txs.txs;
@@ -180,7 +180,7 @@ function Groestlwallet() {
 		        		return res.json( { balance: false} );
 
 		        	}
-		        	
+
 		        });
 			})
 
@@ -188,16 +188,16 @@ function Groestlwallet() {
 
 		/*
 		 * Get the tx info for the particular address
-		 * 
+		 *
 		 */
 		self.app.get('/txs/:address', function(req, res, next) {
 			res.header("Access-Control-Allow-Origin", "*");
 			res.header("Access-Control-Allow-Headers", "X-Requested-With");
 
-			var address =    req.params.address; 
+			var address =    req.params.address;
 
 			https.get('https://chainz.cryptoid.info/grs/api.dws?q=multiaddr&key=' + key + '&active=' + address, function(response) {
-			  	
+
 			  	var body = '';
 		        response.on('data', function(d) {
 		            body += d;
@@ -206,9 +206,9 @@ function Groestlwallet() {
 		        response.on('end', function() {
 
 		        	body = body.substr(body.indexOf('"txs":'))
-		        	body = "{" + body.substr(0, body.length-1) + "}";		        	
+		        	body = "{" + body.substr(0, body.length-1) + "}";
 
-		        	try { 
+		        	try {
 
 		        		return res.json( JSON.parse(body) );
 
@@ -217,7 +217,7 @@ function Groestlwallet() {
 		        		console.log(err)
 					return res.json( {} );
 		        	}
-		        	
+
 		        });
 			})
 
@@ -225,13 +225,13 @@ function Groestlwallet() {
 
 		/*
 		 * Get unspent tx for the given address through chainz API
-		 * 
+		 *
 		 */
 		self.app.get('/unspent/:address', function(req, res, next) {
 			res.header("Access-Control-Allow-Origin", "*");
 			res.header("Access-Control-Allow-Headers", "X-Requested-With");
 
-			var address =    req.params.address; 
+			var address =    req.params.address;
 
 			https.get('https://chainz.cryptoid.info/grs/api.dws?q=unspent&key=' + key + '&active=' + address, function(response) {
 			  	var body = '';
@@ -241,12 +241,12 @@ function Groestlwallet() {
 		        response.on('end', function() {
 		        	//console.log(body)
 		        	try {
-		        		res.json( JSON.parse(body) );	
+		        		res.json( JSON.parse(body) );
 		        	} catch ( err ) {
 		        		console.log(" error : /unspent/:address -> " , err);
-		        		res.json( { } );	
+		        		res.json( { } );
 		        	}
-		        	
+
 		        });
 			})
 
@@ -263,7 +263,7 @@ function Groestlwallet() {
 		})
 
 
-		
+
 	})
 
 	self.btcpriceList = {};
@@ -287,7 +287,7 @@ function Groestlwallet() {
       			setTimeout( self.getTicker, 1000*60*15 );
       			return;
       		}
-        	
+
         	https.get('https://www.groestlcoin.org/grsticker.php', function(response) {
 
         		var body = '';
@@ -298,15 +298,15 @@ function Groestlwallet() {
 
 		        	var price = 0;
 		        	try {
-		        		price = parseFloat(body);	
+		        		price = parseFloat(body);
 		        	} catch ( er ) {
 		        		console.log( er );
 		        		setTimeout( self.getTicker, 1000*60*15 );
 		        		return;
 		        	}
-		        	
+
 		        	for(var i in btcpriceList) {
-		        		btcpriceList[i].last = btcpriceList[i].last * price;		        		
+		        		btcpriceList[i].last = btcpriceList[i].last * price;
 					delete btcpriceList[i].averages;
 		        		delete btcpriceList[i].timestamp;
 		        	}
@@ -323,18 +323,18 @@ function Groestlwallet() {
 	}
 	/*
 	self.updateBalance = function(address) {
-		
+
 		var socketId = self.addr_sub[address];
         var socket = self.webSocketMap[socketId];
 
         if(socket){
-        	socket.emit("message", 
+        	socket.emit("message",
             {
                 op      :  "balance",
                 message :  "  "
-            })  	
+            })
         }
-        //console.log(address, socketId)       
+        //console.log(address, socketId)
 
 	}
 
@@ -345,20 +345,20 @@ function Groestlwallet() {
 		self.webSocketsPublic = self.io.of('/pub-soc').on('connection', function(socket) {
             //console.log("public-websocket "+socket.id+" connected");
 
-            self.webSocketMap[socket.id] = socket;            
-            socket.on('disconnect', function() {            
-                delete self.webSocketMap[socket.id];                
+            self.webSocketMap[socket.id] = socket;
+            socket.on('disconnect', function() {
+                delete self.webSocketMap[socket.id];
                 self.deleteAddSub( socket.id )
                 //console.log("public-websocket " + socket.id + " disconnected");
             })
 
             socket.on('message', function(msg, callback) {
-	            try {	            	
+	            try {
 	                self.emit('websocket::'+msg.op, msg, callback, socket);
 	            }
 	            catch( ex ) { console.error(ex.stack); }
 	        });
-        });	
+        });
 	})
 
 	self.deleteAddSub = function( sid ) {
@@ -375,7 +375,7 @@ function Groestlwallet() {
 	self.addr_sub = {};
 
 	self.on('websocket::addr_sub', function(msg, callback, socket){
-		self.addr_sub[msg.addr] = socket.id;		
+		self.addr_sub[msg.addr] = socket.id;
 		callback()
 	})*/
 }
