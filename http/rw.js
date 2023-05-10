@@ -19,40 +19,34 @@ rush = window.rush = {
     "currency": "USD",
     "useFiat": false,
     "useFiat2": false,
-    "firstTime":false,
+    "firstTime": false,
     "currency": "USD",
-    "currencyOptions": ["ARS","AUD","BRL","CAD","CHF","CLP","CNY","CZK","DKK","EUR","GBP","HKD","HRK","HUF","INR","ISK","JPY","KRW","NZD","PLN","RON","RUB","SEK","SGD","THB","TRY","TWD","USD"],
-    "sweeping":"",
+    "currencyOptions": ["ARS", "AUD", "BRL", "CAD", "CHF", "CLP", "CNY", "CZK", "DKK", "EUR", "GBP", "HKD", "HRK", "HUF", "INR", "ISK", "JPY", "KRW", "NZD", "PLN", "RON", "RUB", "SEK", "SGD", "THB", "TRY", "TWD", "USD"],
+    "sweeping": "",
     "getBalanceBlock": false,
     "chartLoaded": false,
 
-    "open": function ()
-    {
+    "open": function() {
         $("#settings").show();
 
-        if ( readCookie("currency") != "" )
-        {
+        if (readCookie("currency") != "") {
             this.currency = readCookie("currency");
         }
 
-        if ( readCookie("txFee") != "" )
-        {
+        if (readCookie("txFee") != "") {
             this.txFee = readCookie("txFee");
         }
 
         //is invoice wallet?
         invoices = localStorage.invoices;
 
-        if ( invoices && invoices != '[]' )
-        {
+        if (invoices && invoices != '[]') {
 
-            invoices = JSON.parse( invoices );
+            invoices = JSON.parse(invoices);
 
-            for ( i in invoices )
-            {
-                if ( invoices[i].address == this.address )
-                {
-                    $("#walletName").html( invoices[i].title );
+            for (i in invoices) {
+                if (invoices[i].address == this.address) {
+                    $("#walletName").html(invoices[i].title);
                     break;
                 }
             }
@@ -137,27 +131,23 @@ rush = window.rush = {
 
         */
 
-        url = "http://jswallet.groestlcoin.org/?z=" + ( Math.floor(Math.random() * 9999999) + 1 ) + "#" + rush.passcode + "&{CODE}";
-        url2="zxing://scan/?ret=" + encodeURIComponent( url ) + "&SCAN_FORMATS=QR";
+        url = "http://jswallet.groestlcoin.org/?z=" + (Math.floor(Math.random() * 9999999) + 1) + "#" + rush.passcode + "&{CODE}";
+        url2 = "zxing://scan/?ret=" + encodeURIComponent(url) + "&SCAN_FORMATS=QR";
         $("#qrlink").attr("href", url2);
 
 
-        if ( rush.firstTime )
-        {
+        if (rush.firstTime) {
             $("#saveURLHolder, #saveURL").show();
 
-            setTimeout( function()
-            {
+            setTimeout(function() {
                 $("#saveURL").slideUp();
 
             }, 7000);
 
-            ga( "send", "event", "Create", "Wallet" );
+            ga("send", "event", "Create", "Wallet");
 
-        }
-        else
-        {
-            ga( "send", "event", "Open", "Wallet" );
+        } else {
+            ga("send", "event", "Open", "Wallet");
 
         }
 
@@ -172,8 +162,7 @@ rush = window.rush = {
         //     }, 200);
         // }
 
-        setInterval( function()
-        {
+        setInterval(function() {
             rush.getFiatPrice();
         }, 300000);
 
@@ -181,20 +170,15 @@ rush = window.rush = {
     },
 
 
-    "check": function ()
-    {
+    "check": function() {
 
-        if ( this.useFiat )
-        {
+        if (this.useFiat) {
             var amount = parseFloat($("#txtAmount").val()) / this.price;
-        }
-        else
-        {
+        } else {
             var amount = $("#txtAmount").val();
         }
 
-        if (amount > this.balance)
-        {
+        if (amount > this.balance) {
             setMsg("You are trying to send more GRS than you have in your balance!");
             return false;
         }
@@ -203,57 +187,46 @@ rush = window.rush = {
 
         total = parseFloat(amount) + parseFloat(this.txFee);
 
-        total = btcFormat( total );
+        total = btcFormat(total);
 
-        if (total > this.balance)
-        {
+        if (total > this.balance) {
             setMsg("You need to leave enough room for the " + this.txFee + " grs miner fee");
             return false;
         }
 
-        if (parseFloat(amount) <= 0)
-        {
+        if (parseFloat(amount) <= 0) {
             setMsg("Please enter an amount!");
 
             return false;
         }
 
-        if ( !this.checkAddress( $('#txtAddress').val() ) )
-        {
+        if (!this.checkAddress($('#txtAddress').val())) {
             setMsg("Invalid address!");
 
             return false;
         }
 
-       return true;
+        return true;
     },
-    "checkAddress": function ( address )
-    {
-        try
-        {
+    "checkAddress": function(address) {
+        try {
             var res = Bitcoin.base58.checkDecode(address);
             var version = res.version
             var payload = res.slice(0);
-            if ( version == 36 )
+            if (version == 36)
                 return true;
-        }
-        catch (err)
-        {
+        } catch (err) {
             return false;
         }
     },
-    "send": function ()
-    {
-        if (!this.check())
-        {
+    "send": function() {
+        if (!this.check()) {
             return;
         }
 
-        if (this.encrypted)
-        {
+        if (this.encrypted) {
 
-            if ($("#password").val() == "")
-            {
+            if ($("#password").val() == "") {
                 setMsg("Your wallet is encrypted. Please enter a password.");
             }
 
@@ -261,20 +234,16 @@ rush = window.rush = {
 
             var passcode = passcode.toString(CryptoJS.enc.Utf8);
 
-            if (!passcode)
-            {
+            if (!passcode) {
                 setMsg("Wrong Password!");
                 return;
             }
 
-        }
-        else
-        {
+        } else {
             var passcode = this.passcode;
         }
 
-        var bytes = Bitcoin.Crypto.SHA256(passcode,
-        {
+        var bytes = Bitcoin.Crypto.SHA256(passcode, {
             asBytes: true
         });
 
@@ -282,17 +251,14 @@ rush = window.rush = {
 
         this.txSec = btcKey.export("base58");
 
-        if ( this.useFiat )
-        {
+        if (this.useFiat) {
             var btcValue = parseFloat($("#txtAmount").val()) / this.price;
-            btcValue = btcFormat( btcValue );
+            btcValue = btcFormat(btcValue);
             this.txAmount = btcValue;
 
-        }
-        else
-        {
+        } else {
             this.txAmount = parseFloat($("#txtAmount").val());
-            this.txAmount = btcFormat( this.txAmount );
+            this.txAmount = btcFormat(this.txAmount);
         }
 
         this.txDest = $('#txtAddress').val();
@@ -302,10 +268,8 @@ rush = window.rush = {
         $("#sendBtn").html("Sending...");
         $("#fiatPrice").hide();
     },
-    "sweep": function ( code )
-    {
-        var bytes = Bitcoin.Crypto.SHA256(code,
-        {
+    "sweep": function(code) {
+        var bytes = Bitcoin.Crypto.SHA256(code, {
             asBytes: true
         });
 
@@ -316,121 +280,112 @@ rush = window.rush = {
         this.txDest = rush.address;
 
 
-        var url = "getBalance/"+ this.address;
+        var url = "getBalance/" + this.address;
 
 
         rush.sweeping = rush.address;
         rush.address = address;
 
 
-        $.ajax(
-        {
+        $.ajax({
             type: "GET",
             url: url,
-            cache : false,
+            cache: false,
             async: true,
-            data:
-            {}
+            data: {}
 
-        }).done(function (msg)
-        {
+        }).done(function(msg) {
 
             // balance = msg / 100000000;
             fee = rush.txFee * 100000000;
 
             amount = msg - fee;
 
-            if ( fee < msg )
-            {
+            if (fee < msg) {
                 amount = amount / 100000000;
 
                 rush.txAmount = amount.toFixed(8);
                 txGetUnspent();
                 $("#sendBtn").attr("disabled", "disabled");
                 $("#sendBtn").html("Sending...");
-            }
-            else
-            {
+            } else {
                 alert("Not enough funds to sweep!");
                 rush.address = rush.sweeping;
-                rush.sweeping="";
+                rush.sweeping = "";
             }
 
 
 
         });
     },
-    "resetInvoiceID": function ()
-    {
+    "resetInvoiceID": function() {
         microtime = new Date().getTime();
 
-        microHash = Bitcoin.Crypto.SHA256( microtime.toString() );
+        microHash = Bitcoin.Crypto.SHA256(microtime.toString());
 
         invoiceID = microHash.substring(0, 10);
 
-        $("#txtInvoiceID").val( invoiceID );
+        $("#txtInvoiceID").val(invoiceID);
     },
-    "openSmartRequestBox": function ()
-    {
+    "openSmartRequestBox": function() {
         $("#settingsTitle .glyphicon, #settingsInvoice").show();
         $("#youtubeLinkBox").hide();
-        $("#settingsTitleText").html( "Payment Request Manager" );
+        $("#settingsTitleText").html("Payment Request Manager");
 
         rush.resetInvoiceID();
 
-        rush.updateInvoices( "SmartRequest" );
+        rush.updateInvoices("SmartRequest");
 
         $("#invoiceType").val("SmartRequest");
 
-        $("#headerBalance").html( "Paid" );
-        $("#headerAmount").html( "Requested" );
+        $("#headerBalance").html("Paid");
+        $("#headerAmount").html("Requested");
 
 
-        $("#btnCreateInvoice, #btnNewRequest").html( "Create Payment Request");
+        $("#btnCreateInvoice, #btnNewRequest").html("Create Payment Request");
 
 
     },
-    "openSmartFundBox": function ()
-    {
+    "openSmartFundBox": function() {
         $("#settingsTitle .glyphicon, #settingsInvoice").show();
-        $("#settingsTitleText").html( "Fundraiser Manager" );
+        $("#settingsTitleText").html("Fundraiser Manager");
         $("#youtubeLinkBox").show();
         $("#txtYoutube").val("");
 
 
         microtime = new Date().getTime();
 
-        microHash = Bitcoin.Crypto.SHA256( microtime.toString() );
+        microHash = Bitcoin.Crypto.SHA256(microtime.toString());
 
         invoiceID = microHash.substring(0, 10);
 
-        $("#txtInvoiceID").val( invoiceID );
+        $("#txtInvoiceID").val(invoiceID);
 
-        rush.updateInvoices( "SmartFund" );
+        rush.updateInvoices("SmartFund");
 
         $("#invoiceType").val("SmartFund");
 
-        $("#headerBalance").html( "Raised" );
-        $("#headerAmount").html( "Goal" );
+        $("#headerBalance").html("Raised");
+        $("#headerAmount").html("Goal");
 
-        $("#btnCreateInvoice, #btnNewRequest").html( "Create Fundraiser");
+        $("#btnCreateInvoice, #btnNewRequest").html("Create Fundraiser");
 
     },
-    "openImportRequest": function ()
-    {
+    "openImportRequest": function() {
         type = $("#invoiceType").val();
 
         $("#importRequestBox").slideDown();
         $("#settingsInvoice, #requestForm").hide();
     },
-    "generate": function ()
-    {
+    "generate": function() {
 
         $("#txtReceiveAmount").blur();
-        $('html, body').animate({ scrollTop: 0 }, 'fast');
+        $('html, body').animate({
+            scrollTop: 0
+        }, 'fast');
 
 
-        setTimeout( function () {
+        setTimeout(function() {
 
             $("#request").modal("show");
             rush.generateNow();
@@ -441,52 +396,43 @@ rush = window.rush = {
 
 
     },
-    "checkInvoice": function ()
-    {
-        if ( !rush.address )
-        {
+    "checkInvoice": function() {
+        if (!rush.address) {
             return false;
         }
 
-        if ( isNaN( $("#txtInvoiceAmount").val() ) || $("#txtInvoiceAmount").val() <= 0 || $("#txtInvoiceAmount").val() == "" || $("#txtInvoiceTitle").val() == "" )
-        {
+        if (isNaN($("#txtInvoiceAmount").val()) || $("#txtInvoiceAmount").val() <= 0 || $("#txtInvoiceAmount").val() == "" || $("#txtInvoiceTitle").val() == "") {
             return false;
         }
 
-        if ( $("#txtInvoiceID").val() == "" )
-        {
+        if ($("#txtInvoiceID").val() == "") {
             return false;
         }
 
-        if ( $("#txtYoutube").val() !== "" )
-        {
-            if ( getVideoID( $("#txtYoutube").val() ) == false )
-            {
+        if ($("#txtYoutube").val() !== "") {
+            if (getVideoID($("#txtYoutube").val()) == false) {
                 return false;
             }
         }
 
         return true;
     },
-    "createInvoice": function ()
-    {
-        if ( !this.checkInvoice() )
-        {
+    "createInvoice": function() {
+        if (!this.checkInvoice()) {
             return false;
         }
 
-        ga( "send", "event", "Invoice", "Create" );
+        ga("send", "event", "Invoice", "Create");
 
 
-        var bytes = Bitcoin.Crypto.SHA256(Bitcoin.Crypto.SHA256(this.passcode + "_" + $("#txtInvoiceID").val()) ,
-        {
+        var bytes = Bitcoin.Crypto.SHA256(Bitcoin.Crypto.SHA256(this.passcode + "_" + $("#txtInvoiceID").val()), {
             asBytes: true
         });
 
         var btcKey = new Bitcoin.Key(bytes);
         var address = btcKey.getBitcoinAddress().toString();
 
-        amount = parseFloat( $("#txtInvoiceAmount").val() );
+        amount = parseFloat($("#txtInvoiceAmount").val());
 
         title = $("#txtInvoiceTitle").val();
 
@@ -494,19 +440,25 @@ rush = window.rush = {
 
         video = $("#txtYoutube").val();
 
-        invoice = {address:address,"amount":amount,title:title,invoiceid:$("#txtInvoiceID").val(),description:$("#txtInvoiceDescription").val(),myAddress:rush.address, type:type, video:video};
+        invoice = {
+            address: address,
+            "amount": amount,
+            title: title,
+            invoiceid: $("#txtInvoiceID").val(),
+            description: $("#txtInvoiceDescription").val(),
+            myAddress: rush.address,
+            type: type,
+            video: video
+        };
 
         invoices = localStorage.invoices;
 
-        if ( !invoices )
-        {
-            localStorage.invoices =  JSON.stringify([invoice]);
-        }
-        else
-        {
-            invoices = JSON.parse( invoices );
-            invoices.push( invoice );
-            localStorage.invoices =  JSON.stringify(invoices);
+        if (!invoices) {
+            localStorage.invoices = JSON.stringify([invoice]);
+        } else {
+            invoices = JSON.parse(invoices);
+            invoices.push(invoice);
+            localStorage.invoices = JSON.stringify(invoices);
         }
 
         $("#txtInvoiceTitle, #txtInvoiceAmount, #txtInvoiceDescription").val("");
@@ -525,34 +477,30 @@ rush = window.rush = {
 
         delete invoice.myAddress;
 
-        urlHash =  btoa( encodeURIComponent( JSON.stringify(invoice) ));
+        urlHash = btoa(encodeURIComponent(JSON.stringify(invoice)));
 
-        rush.updateInvoices( invoice.type );
+        rush.updateInvoices(invoice.type);
 
         $("#btnNewRequest").show();
 
 
     },
-    "generateNow": function ()
-    {
+    "generateNow": function() {
         amount = $("#txtReceiveAmount").val();
 
-        if ( this.useFiat2 )
-        {
-            amount = parseFloat( amount ) / this.price;
-            amount = btcFormat( amount );
+        if (this.useFiat2) {
+            amount = parseFloat(amount) / this.price;
+            amount = btcFormat(amount);
         }
 
         $("#receiveQR").attr("src", "https://chart.googleapis.com/chart?cht=qr&chs=300x300&chl=groestlcoin%3A" + this.address + "%3Famount%3D" + amount + "&chld=H|0");
 
         $("#generateAmount").html(amount);
 
-        $("#generateAddress").html( this.address );
+        $("#generateAddress").html(this.address);
     },
-    "updateInvoices": function ( type )
-    {
-        if ( !type )
-        {
+    "updateInvoices": function(type) {
+        if (!type) {
             type = "SmartFund";
         }
 
@@ -563,63 +511,53 @@ rush = window.rush = {
 
         myInvoiceCount = 0;
 
-        if ( invoices && invoices != '[]' )
-        {
+        if (invoices && invoices != '[]') {
 
-            invoices = JSON.parse( invoices );
+            invoices = JSON.parse(invoices);
 
             addresses = [];
 
-            for ( i in invoices )
-            {
-                if ( invoices[i].myAddress == rush.address && (invoices[i].type==type || !invoices[i].type) )
-                {
-                    addresses.push( invoices[i].address );
+            for (i in invoices) {
+                if (invoices[i].myAddress == rush.address && (invoices[i].type == type || !invoices[i].type)) {
+                    addresses.push(invoices[i].address);
 
-                    myInvoiceCount ++;
-                    $("#invoicesBody").prepend( "<tr><td><a class='openInvoice' invoiceNum='" + i + "'>" + htmlEncode( invoices[i].title ) + "</a></td><td>" + htmlEncode( invoices[i].invoiceid ) + "</td><td class='hidden-sm hidden-xs' id='inv_" + invoices[i].address + "'></td><td >" + htmlEncode( invoices[i].amount.toFixed(8) ) + "</td><td style='text-align:right;'><a class='openInvoiceWallet' title='Open " + getTypeName( type ) + " Wallet' invoiceNum='" + i + "'><span class='glyphicon glyphicon-folder-open'></span></a> <a class='sweepInvoice' title='Sweep Funds' invoiceNum='" + i + "'><span class='glyphicon glyphicon-log-in'></span></a> <a class='deleteInvoice' title='Delete' invoiceNum='" + i + "'><span class='glyphicon glyphicon-trash'></span></a></td></tr>" );
+                    myInvoiceCount++;
+                    $("#invoicesBody").prepend("<tr><td><a class='openInvoice' invoiceNum='" + i + "'>" + htmlEncode(invoices[i].title) + "</a></td><td>" + htmlEncode(invoices[i].invoiceid) + "</td><td class='hidden-sm hidden-xs' id='inv_" + invoices[i].address + "'></td><td >" + htmlEncode(invoices[i].amount.toFixed(8)) + "</td><td style='text-align:right;'><a class='openInvoiceWallet' title='Open " + getTypeName(type) + " Wallet' invoiceNum='" + i + "'><span class='glyphicon glyphicon-folder-open'></span></a> <a class='sweepInvoice' title='Sweep Funds' invoiceNum='" + i + "'><span class='glyphicon glyphicon-log-in'></span></a> <a class='deleteInvoice' title='Delete' invoiceNum='" + i + "'><span class='glyphicon glyphicon-trash'></span></a></td></tr>");
                 }
             }
         }
 
         $("#invoiceCount").html(myInvoiceCount);
 
-        $(".invoiceType").html( getTypeName( type ) );
+        $(".invoiceType").html(getTypeName(type));
 
 
-        if ( myInvoiceCount < 1 )
-        {
+        if (myInvoiceCount < 1) {
             $("#invoiceTx, #invoiceCountLine").hide();
             $("#noInvoice").show();
 
-        }
-        else
-        {
+        } else {
             $("#noInvoice").hide();
 
             $("#invoiceTx, #invoiceCountLine").show();
 
-            $.ajax(
-            {
+            $.ajax({
                 type: "GET",
                 url: "https://blockchain.info/multiaddr?cors=true&active=" + addresses.join("|"),
                 async: true,
                 dataType: "json",
-                cache : false,
-                data:
-                {}
+                cache: false,
+                data: {}
 
-            }).done(function (msg)
-            {
-                for ( i in msg.addresses)
-                {
+            }).done(function(msg) {
+                for (i in msg.addresses) {
                     address = msg.addresses[i].address;
                     balance = msg.addresses[i].final_balance;
 
                     balance = (balance / 100000000);
                     balance = balance.toFixed(8);
 
-                    $("#inv_" + address).html( balance );
+                    $("#inv_" + address).html(balance);
 
                 }
 
@@ -630,47 +568,45 @@ rush = window.rush = {
 
         $("#invoicesBody td:nth-child(5) a").tooltip(); //Tooltips
     },
-    "getHistory": function ()
-    {
+    "getHistory": function() {
         var url = "txs/" + this.address;
 
         $("#txTable tbody").html("");
 
-        $.ajax(
-        {
+        $.ajax({
             type: "GET",
             url: url,
             async: true,
             dataType: "json",
-            cache : false,
-            data:
-            {}
+            cache: false,
+            data: {}
 
-        }).done(function (msg)
-        {
-             if ( msg.txs.length > 0 )
-            {
+        }).done(function(msg) {
+            if (msg.txs.length > 0) {
                 $("#txBox").show();
                 $("#noTx, #txList .break").hide();
             }
 
             //for ( i in msg.data.txs )
-            for ( i=0;i<msg.txs.length;i++ )
-            {
-                txTime = moment( msg.txs[i].time_utc ).format( "MMM D YYYY [<span class='time'>]h:mma[</span>]" );
+            for (i = 0; i < msg.txs.length; i++) {
+                txTime = moment(msg.txs[i].time_utc).format("MMM D YYYY [<span class='time'>]h:mma[</span>]");
 
-                $("#txTable tbody").append( '<tr><td>' + txTime + '</td><td class="hidden-sm hidden-xs"><a href="https://chainz.cryptoid.info/grs/tx.dws?' + msg.txs[i].hash + '.htm" target="_blank" >' + msg.txs[i].hash.substring(0,30) + '...</a></td><td class="hidden-sm hidden-xs">' +  formatMoney( msg.txs[i].confirmations || 0 ) + '</td><td>' + btcFormat( msg.txs[i].change/1e8 ) + '</td></tr>' );
+                $("#txTable tbody").append('<tr><td>' + txTime + '</td><td class="hidden-sm hidden-xs"><a href="https://chainz.cryptoid.info/grs/tx.dws?' + msg.txs[i].hash + '.htm" target="_blank" >' + msg.txs[i].hash.substring(0, 30) + '...</a></td><td class="hidden-sm hidden-xs">' + formatMoney(msg.txs[i].confirmations || 0) + '</td><td>' + btcFormat(msg.txs[i].change / 1e8) + '</td></tr>');
             }
 
-            $("#txTable tbody tr td:nth-child(4)").each( function ( i )
-            {
-                if ( $(this).html() > 0 )
-                {
-                    $(this).css({color: "#F49500", "text-align":"right", "padding-right": "30px"});
-                }
-                else
-                {
-                    $(this).css({color: "#52B3EA", "text-align":"right", "padding-right": "30px"});
+            $("#txTable tbody tr td:nth-child(4)").each(function(i) {
+                if ($(this).html() > 0) {
+                    $(this).css({
+                        color: "#F49500",
+                        "text-align": "right",
+                        "padding-right": "30px"
+                    });
+                } else {
+                    $(this).css({
+                        color: "#52B3EA",
+                        "text-align": "right",
+                        "padding-right": "30px"
+                    });
 
                 }
 
@@ -682,81 +618,73 @@ rush = window.rush = {
         });
 
     },
-    "setTxFee": function ( fee )
-    {
-        this.txFee = parseFloat( fee );
-        setCookie( "txFee", parseFloat(fee), 100 );
+    "setTxFee": function(fee) {
+        this.txFee = parseFloat(fee);
+        setCookie("txFee", parseFloat(fee), 100);
     },
-    "getUnconfirmed": function ()
-    {
+    "getUnconfirmed": function() {
         var url = "/unconfirmed/" + this.address;
 
-        $.ajax(
-        {
+        $.ajax({
             type: "GET",
             url: url,
             async: true,
             dataType: "json",
-            cache : false,
-            data:
-            {}
+            cache: false,
+            data: {}
 
-        }).done(function (msg)
-        {
+        }).done(function(msg) {
             unconfirmed = "";
 
             unconfirmedArr = Array();
 
             unconfirmedCount = 0;
 
-            for ( i in msg.data.unconfirmed )
-            {
+            for (i in msg.data.unconfirmed) {
                 unconfirmedCount++;
-                if ( unconfirmedArr[msg.data.unconfirmed[i].tx] == undefined )
-                {
+                if (unconfirmedArr[msg.data.unconfirmed[i].tx] == undefined) {
                     unconfirmedArr[msg.data.unconfirmed[i].tx] = {};
                 }
 
-                if ( unconfirmedArr[msg.data.unconfirmed[i].tx].amount == undefined )
-                {
+                if (unconfirmedArr[msg.data.unconfirmed[i].tx].amount == undefined) {
                     unconfirmedArr[msg.data.unconfirmed[i].tx].amount = msg.data.unconfirmed[i].amount;
-                }
-                else
-                {
+                } else {
                     unconfirmedArr[msg.data.unconfirmed[i].tx].amount += msg.data.unconfirmed[i].amount;
                 }
 
                 unconfirmedArr[msg.data.unconfirmed[i].tx].time_utc = msg.data.unconfirmed[i].time_utc;
             }
 
-            if ( unconfirmedCount > 0 )
-            {
+            if (unconfirmedCount > 0) {
                 $("#txBox").show();
                 $("#noTx, #txList .break").hide();
             }
 
 
-            for ( i in unconfirmedArr )
-            {
-                txTime = moment( unconfirmedArr[i].time_utc ).format( "MMM D YYYY [<span class='time'>]h:mma[</span>]" );
+            for (i in unconfirmedArr) {
+                txTime = moment(unconfirmedArr[i].time_utc).format("MMM D YYYY [<span class='time'>]h:mma[</span>]");
 
-                unconfirmed += '<tr><td>' + txTime + '</td><td class="hidden-sm hidden-xs"><a href="https://chainz.cryptoid.info/grs/tx.dws?' + i + '.htm" target="_blank">' + i.substring(0,30) + '</a></td><td class="hidden-sm hidden-xs">0</td><td>' + btcFormat( unconfirmedArr[i].amount ) + '</td></tr>';
+                unconfirmed += '<tr><td>' + txTime + '</td><td class="hidden-sm hidden-xs"><a href="https://chainz.cryptoid.info/grs/tx.dws?' + i + '.htm" target="_blank">' + i.substring(0, 30) + '</a></td><td class="hidden-sm hidden-xs">0</td><td>' + btcFormat(unconfirmedArr[i].amount) + '</td></tr>';
             }
 
 
-            $("#txTable tbody").prepend( unconfirmed );
+            $("#txTable tbody").prepend(unconfirmed);
 
-            $("#txTable tbody tr td:nth-child(4)").each( function ( i )
-            {
-               if ( $(this).html() > 0 )
-               {
-                   $(this).css({color: "#F49500", "text-align":"right", "padding-right": "30px"});
-               }
-               else
-               {
-                   $(this).css({color: "#52B3EA", "text-align":"right", "padding-right": "30px"});
+            $("#txTable tbody tr td:nth-child(4)").each(function(i) {
+                if ($(this).html() > 0) {
+                    $(this).css({
+                        color: "#F49500",
+                        "text-align": "right",
+                        "padding-right": "30px"
+                    });
+                } else {
+                    $(this).css({
+                        color: "#52B3EA",
+                        "text-align": "right",
+                        "padding-right": "30px"
+                    });
 
-               }
+                }
 
             });
 
@@ -765,33 +693,30 @@ rush = window.rush = {
         });
 
     },
-    "get24Chart": function()
-    {
-        if ( this.chartLoaded )
-        {
+    "get24Chart": function() {
+        if (this.chartLoaded) {
             $("#chartBox").slideDown();
             return;
         }
 
         $.ajax({
-           type: "GET",
-           url: "https://api.bitcoinaverage.com/history/" + rush.currency + "/per_minute_24h_sliding_window.csv",
-           dataType: "text",
-           cache : false,
-           success: function(allText)
-            {
+            type: "GET",
+            url: "https://api.bitcoinaverage.com/history/" + rush.currency + "/per_minute_24h_sliding_window.csv",
+            dataType: "text",
+            cache: false,
+            success: function(allText) {
                 rush.chartLoaded = true;
 
                 var allTextLines = allText.split(/\r\n|\n/);
                 var headers = allTextLines[0].split(',');
                 var lines = [];
 
-                for (var i=1; i<allTextLines.length; i++) {
+                for (var i = 1; i < allTextLines.length; i++) {
                     var data = allTextLines[i].split(',');
                     if (data.length == headers.length) {
 
                         var tarr = [];
-                        for (var j=0; j<headers.length; j++) {
+                        for (var j = 0; j < headers.length; j++) {
                             tarr.push(data[j]);
                         }
                         lines.push(tarr);
@@ -801,16 +726,14 @@ rush = window.rush = {
 
                 hours = [];
 
-                for ( i in lines )
-                {
-                    if ( i % 2 == 0 )
-                    {
+                for (i in lines) {
+                    if (i % 2 == 0) {
 
-                        var date = new Date( lines[i][0] + " GMT");
+                        var date = new Date(lines[i][0] + " GMT");
 
-                        unix = date.getTime()  ;
+                        unix = date.getTime();
 
-                        hours.push( [unix, lines[i][1] ] );
+                        hours.push([unix, lines[i][1]]);
                     }
 
 
@@ -818,16 +741,20 @@ rush = window.rush = {
 
                 $("#chartBox").slideDown();
 
-                $.plot("#chart24", [ hours ],
-                    {
-                           xaxis: {mode:"time", timeformat: "%H", timezone: "browser", tickSize: [3, "hour"]},
-                           colors: ["#F49500"],
-                           grid: {
+                $.plot("#chart24", [hours], {
+                        xaxis: {
+                            mode: "time",
+                            timeformat: "%H",
+                            timezone: "browser",
+                            tickSize: [3, "hour"]
+                        },
+                        colors: ["#F49500"],
+                        grid: {
                             color: "#64657A",
-                            borderColor:"#3E3F4D",
-                            borderWidth:1
-                           }
-                   }
+                            borderColor: "#3E3F4D",
+                            borderWidth: 1
+                        }
+                    }
 
                 );
 
@@ -837,21 +764,17 @@ rush = window.rush = {
 
         });
     },
-    "getBalance": function ()
-    {
-        var url = "getBalance/"+ this.address;
+    "getBalance": function() {
+        var url = "getBalance/" + this.address;
 
-        $.ajax(
-        {
+        $.ajax({
             type: "GET",
             url: url,
             async: true,
-            cache : false,
-            data:
-            {}
+            cache: false,
+            data: {}
 
-        }).done(function (msg)
-        {
+        }).done(function(msg) {
             msg = msg.balance;
 
             rush.balance = msg / 100000000;
@@ -860,22 +783,22 @@ rush = window.rush = {
             if (spendable < 0)
                 spendable = 0;
 
-            $("#btcBalance").html( btcFormat( rush.balance ) );
-            $("#spendable").html("Ç¤" + btcFormat( spendable ) );
+            $("#btcBalance").html(btcFormat(rush.balance));
+            $("#spendable").html("Ç¤" + btcFormat(spendable));
 
             rush.getFiatPrice();
 
-            setTimeout( function () {rush.getHistory()}, 1000);
+            setTimeout(function() {
+                rush.getHistory()
+            }, 1000);
 
         });
 
 
 
     },
-    "getFiatPrefix": function()
-    {
-        switch ( this.currency )
-        {
+    "getFiatPrefix": function() {
+        switch (this.currency) {
             case "AUD":
             case "USD":
             case "CAD":
@@ -918,27 +841,25 @@ rush = window.rush = {
                 return "$";
         }
     },
-    "getFiatValue": function ()
-    {
+    "getFiatValue": function() {
         this.fiatValue = this.price * rush.balance;
 
-        $("#fiatValue").html( this.getFiatPrefix() + formatMoney(  this.fiatValue.toFixed(2) ) );
+        $("#fiatValue").html(this.getFiatPrefix() + formatMoney(this.fiatValue.toFixed(2)));
 
-        $("#currentPrice").html( this.getFiatPrefix() + formatMoney(  rush.price.toFixed(2)  ));
+        $("#currentPrice").html(this.getFiatPrefix() + formatMoney(rush.price.toFixed(2)));
     },
-    "getFiatPrice": function ()
-    {
+    "getFiatPrice": function() {
         currency = this.currency;
 
         $.ajax({
             type: "GET",
             url: "ticker",
             async: true,
-            cache : false,
+            cache: false,
             data: {},
             dataType: "json"
 
-        }).done(function (msg) {
+        }).done(function(msg) {
 
 
             price = msg[currency].last;
@@ -947,11 +868,13 @@ rush = window.rush = {
 
             price = price.toFixed(2);
 
-            $("#price").html(rush.getFiatPrefix()+formatMoney(price) ).show();
+            $("#price").html(rush.getFiatPrefix() + formatMoney(price)).show();
 
-            $("#currencyValue").html( rush.currency );
+            $("#currencyValue").html(rush.currency);
 
-            $(".currency").animate({opacity:1});
+            $(".currency").animate({
+                opacity: 1
+            });
 
             rush.getFiatValue();
 
@@ -959,28 +882,23 @@ rush = window.rush = {
         });
 
     },
-    "amountFiatValue": function ()
-    {
+    "amountFiatValue": function() {
 
         var amount = $("#txtAmount").val();
 
         amount = parseFloat(amount);
 
-        if (!amount)
-        {
+        if (!amount) {
             amount = 0;
         }
 
 
-        if ( rush.useFiat )
-        {
+        if (rush.useFiat) {
             var btcValue = amount / this.price;
-            btcValue = btcFormat( btcValue );
+            btcValue = btcFormat(btcValue);
             $("#fiatPrice").html("Ç¤" + btcValue + ")");
 
-        }
-        else
-        {
+        } else {
             var fiatValue = this.price * amount;
 
             fiatValue = fiatValue.toFixed(2);
@@ -989,28 +907,23 @@ rush = window.rush = {
         }
 
     },
-    "amountFiatValue2": function ()
-    {
+    "amountFiatValue2": function() {
 
         var amount = $("#txtReceiveAmount").val();
 
         amount = parseFloat(amount);
 
-        if (!amount)
-        {
+        if (!amount) {
             amount = 0;
         }
 
 
-        if ( rush.useFiat2 )
-        {
+        if (rush.useFiat2) {
             var btcValue = amount / this.price;
-            btcValue = btcFormat( btcValue );
+            btcValue = btcFormat(btcValue);
             $("#fiatPrice2").html("Ç¤" + btcValue + ")");
 
-        }
-        else
-        {
+        } else {
             var fiatValue = this.price * amount;
 
             fiatValue = fiatValue.toFixed(2);
@@ -1019,12 +932,10 @@ rush = window.rush = {
         }
 
     },
-    "prepareReset": function ()
-    {
+    "prepareReset": function() {
         setMsg("Are you sure you want to generate a new address? <strong>This will delete your current one and all funds associated with it.</strong> <br/><button id='confirmReset'>Yes</button> <button id='noReset'>No</button>");
     },
-    "reset": function ()
-    {
+    "reset": function() {
 
 
         $("#errorBox").hide();
@@ -1046,10 +957,9 @@ rush = window.rush = {
 
     },
 
-    "txComplete": function ()
-    {
+    "txComplete": function() {
 
-        ga( "send", "event", "Send", "Wallet" );
+        ga("send", "event", "Send", "Wallet");
 
         setMsg("Payment sent!", true);
 
@@ -1059,8 +969,7 @@ rush = window.rush = {
 
         this.txSec = "";
 
-        if ( rush.sweeping != "" )
-        {
+        if (rush.sweeping != "") {
             rush.address = rush.sweeping;
             this.sweeping = "";
         }
@@ -1068,7 +977,9 @@ rush = window.rush = {
 
         $("#password").val("");
 
-        $("#txtAmount").val("").css({"font-size":"14px"});
+        $("#txtAmount").val("").css({
+            "font-size": "14px"
+        });
         $("#txtAddress").val("");
         $("#fiatPrice").show();
 
@@ -1080,23 +991,17 @@ rush = window.rush = {
 
         rush.getBalanceBlock = true;
 
-        setTimeout( function ()
-        {
+        setTimeout(function() {
             rush.getBalanceBlock = false;
         }, 1000);
 
     },
-    "exportWallet": function ()
-    {
+    "exportWallet": function() {
 
-        if (!this.encrypted)
-        {
+        if (!this.encrypted) {
             setMsg("" + rush.passcode);
-        }
-        else
-        {
-            if ($("#password").val() == "")
-            {
+        } else {
+            if ($("#password").val() == "") {
                 setMsg("Please enter password to decrypt wallet.");
                 return;
             }
@@ -1105,8 +1010,7 @@ rush = window.rush = {
 
             var passcode = passcode.toString(CryptoJS.enc.Utf8);
 
-            if (!passcode)
-            {
+            if (!passcode) {
                 setMsg("Incorrenct Password!");
                 return;
             }
@@ -1118,15 +1022,12 @@ rush = window.rush = {
         }
 
     },
-    "importWallet": function ()
-    {
+    "importWallet": function() {
         setMsg("Importing a brain wallet will replace your current wallet. You will lose your balance if you haven't backed it up!<br/><input type='text' id='importBrainTxt' placeholder='Brainwallet'> <button id='confirmImport'>Import</button>");
     },
-    "confirmImport": function ()
-    {
+    "confirmImport": function() {
 
-        if (!$("#confirmImport").attr("confirmed"))
-        {
+        if (!$("#confirmImport").attr("confirmed")) {
             $("#confirmImport").html("Are you sure? Click to confirm!").attr("confirmed", "true");
             $("<button id='clearBox'>No</button>").insertAfter("#confirmImport");
             return;
@@ -1134,8 +1035,7 @@ rush = window.rush = {
 
         rush.passcode = $("#importBrainTxt").val();
 
-        var bytes = Bitcoin.Crypto.SHA256(rush.passcode,
-        {
+        var bytes = Bitcoin.Crypto.SHA256(rush.passcode, {
             asBytes: true
         });
 
@@ -1149,13 +1049,11 @@ rush = window.rush = {
         this.encrypted = false;
         this.txSec = "";
 
-        chrome.storage.local.set(
-        {
+        chrome.storage.local.set({
             'code': rush.passcode,
             'encrypted': false,
             'address': address
-        }, function ()
-        {
+        }, function() {
             rush.open();
 
         });
@@ -1171,36 +1069,33 @@ rush = window.rush = {
 
 };
 
-function popup(txt)
-{
+function popup(txt) {
     setGPGMsg('<textarea id="gpgBox" readonly></textarea>');
 
     $("#gpgBox").val(txt);
 }
 
-function popupMsg(txt)
-{
+function popupMsg(txt) {
     // txt = txt.replace(/\n/g, '<br />');
     setGPGMsg('<div id="messageBox">' + txt + '</div>');
 }
 
 
-$(document).ready(function ()
-{
+$(document).ready(function() {
 
     var code = window.location.hash;
 
 
 });
 
-Date.prototype.format = function (format) //author: meizz
+Date.prototype.format = function(format) //author: meizz
 {
     var o = {
         "M+": this.getMonth() + 1, //month
         "d+": this.getDate(), //day
         "H+": this.getHours(), //hour
-        "h+": ((this.getHours() % 12)==0)?"12":(this.getHours() % 12), //hour
-        "z+": ( this.getHours()>11 )?"pm":"am", //hour
+        "h+": ((this.getHours() % 12) == 0) ? "12" : (this.getHours() % 12), //hour
+        "z+": (this.getHours() > 11) ? "pm" : "am", //hour
         "m+": this.getMinutes(), //minute
         "s+": this.getSeconds(), //second
         "q+": Math.floor((this.getMonth() + 3) / 3), //quarter
@@ -1216,33 +1111,28 @@ Date.prototype.format = function (format) //author: meizz
     return format;
 }
 
-function formatMoney(x)
-{
+function formatMoney(x) {
     return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
-function htmlEncode(value)
-{
+function htmlEncode(value) {
     //create a in-memory div, set it's inner text(which jQuery automatically encodes)
     //then grab the encoded contents back out.  The div never exists on the page.
     return $('<div/>').text(value).html();
 }
 
-function s2hex(s)
-{
+function s2hex(s) {
     return Bitcoin.convert.bytesToHex(Bitcoin.convert.stringToBytes(s))
 }
 
-function playBeep()
-{
+function playBeep() {
     var snd = document.getElementById('noise');
     snd.src = 'balance.wav';
     snd.load();
     snd.play();
 }
 
-function playBaron()
-{
+function playBaron() {
     var snd = document.getElementById('noise');
     rush.snd = snd;
     snd.src = 'baron.mp3';
@@ -1250,8 +1140,7 @@ function playBaron()
     snd.play();
 }
 
-function playTurn()
-{
+function playTurn() {
     var snd = document.getElementById('noise');
     rush.snd = snd;
     snd.src = 'turn.mp3';
@@ -1259,9 +1148,9 @@ function playTurn()
     snd.play();
 }
 
-function ajax(url,success,data) {
+function ajax(url, success, data) {
     var xhr = new XMLHttpRequest();
-    xhr.onreadystatechange = function () {
+    xhr.onreadystatechange = function() {
         if (xhr.readyState == 4) {
             success(xhr.responseText);
             xhr.close;
@@ -1272,40 +1161,32 @@ function ajax(url,success,data) {
     xhr.send(data);
 }
 
-function tx_fetch(url, onSuccess, onError, postdata)
-{
-    $.ajax(
-    {
+function tx_fetch(url, onSuccess, onError, postdata) {
+    $.ajax({
         url: url,
         data: postdata || '',
         type: "POST",
-        cache : false,
-        success: function (res)
-        {
+        cache: false,
+        success: function(res) {
             onSuccess(JSON.stringify(res));
 
         },
-        error: function (xhr, opt, err)
-        {
+        error: function(xhr, opt, err) {
             // console.log("error!");
         }
     });
 }
 
-function setMsg( msg, green )
-{
+function setMsg(msg, green) {
     $("#errorBox").slideDown();
-    $("#errorTxt").html( msg );
+    $("#errorTxt").html(msg);
 
-    if ( green )
-    {
+    if (green) {
         $("#errorBox").addClass("green");
-    }
-    else
+    } else
         $("#errorBox").removeClass("green");
 
-    setTimeout( function ()
-    {
+    setTimeout(function() {
         $("#errorBox").slideUp();
     }, 5000);
 

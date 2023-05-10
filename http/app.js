@@ -1,54 +1,48 @@
 // -- transactions --
 var txType = 'txBCI';
 
-function txGetUnspent()
-{
+function txGetUnspent() {
     var addr = rush.address;
 
     var url = '/unspent/' + addr;
 
     //url = prompt('Press OK to download transaction history:', url);
-    if (url != null && url != "")
-    {
+    if (url != null && url != "") {
         rush.txUnspent = '';
         ajax(url, txParseUnspent);
-    }
-    else
-    {
+    } else {
         txSetUnspent(rush.txUnspent);
     }
 }
 
 var preunconfirmed = "";
-function checkForBalance () {
+
+function checkForBalance() {
 
     var addr = rush.address;
 
     var url = '/getUnspent/' + addr;
 
-    $.ajax(
-    {
+    $.ajax({
         type: "GET",
         url: url,
         async: true,
         dataType: "json",
-        cache : false,
-        data:
-        {}
+        cache: false,
+        data: {}
 
-    }).done(function (msg)
-    {
-        if(msg.balance) {
+    }).done(function(msg) {
+        if (msg.balance) {
 
-            if(msg .tx && preunconfirmed != msg.tx) {
+            if (msg.tx && preunconfirmed != msg.tx) {
 
                 rush.getBalance();
-                playBeep();    
+                playBeep();
                 preunconfirmed = msg.tx;
 
             }
-            
-        }   
+
+        }
 
         setTimeout(checkForBalance, 8000)
     });
@@ -57,8 +51,7 @@ function checkForBalance () {
 setTimeout(checkForBalance, 1000)
 
 
-function txSetUnspent(text)
-{
+function txSetUnspent(text) {
     var r = JSON.parse(text);
     txUnspent = JSON.stringify(r, null, 4);
     rush.txUnspent = txUnspent;
@@ -69,9 +62,9 @@ function txSetUnspent(text)
     var fee = parseFloat(rush.txFee);
     rush.balance = fval;
 
-    bigfVal = btcstr2bignum( fval.toString() );
-    bigFee = btcstr2bignum( fee.toString() );
-    bigValue = bigfVal.subtract( bigFee );
+    bigfVal = btcstr2bignum(fval.toString());
+    bigFee = btcstr2bignum(fee.toString());
+    bigValue = bigfVal.subtract(bigFee);
 
 
     // rush.txValue = fval - fee;
@@ -81,16 +74,14 @@ function txSetUnspent(text)
     txRebuild();
 }
 
-function txParseUnspent(text)
-{
+function txParseUnspent(text) {
     if (text == '')
         setMsg('No data');
     else
         txSetUnspent(text);
 }
 
-function txOnAddDest()
-{
+function txOnAddDest() {
     var list = $(document).find('.txCC');
     var clone = list.last().clone();
     clone.find('.help-inline').empty();
@@ -106,8 +97,7 @@ function txOnAddDest()
     return false;
 }
 
-function txOnRemoveDest()
-{
+function txOnRemoveDest() {
     var list = $(document).find('.txCC');
     if (list.size() == 2)
         $('#txRemoveDest').attr('disabled', true);
@@ -115,12 +105,10 @@ function txOnRemoveDest()
     return false;
 }
 
-function txSent(text)
-{
+function txSent(text) {
 
-    text = eval ( "(" + text + ")" );
-    if ( text.error )
-    {
+    text = eval("(" + text + ")");
+    if (text.error) {
 
         setMsg("There seems to be a problem with building the transaction. Please try again..")
         /*
@@ -136,15 +124,12 @@ function txSent(text)
 
             rush.txSec = "";
         }*/
-    }
-    else
-    {
+    } else {
         rush.txComplete();
     }
 }
 
-function txSend()
-{
+function txSend() {
     var txAddr = rush.address;
     var address = TX.getAddress();
 
@@ -160,29 +145,24 @@ function txSend()
     url = '/pushtx';
     postdata = 'tx=' + tx + '&address=' + txAddr + "&dest=" + dest;
     //url = prompt(r + 'Send transaction:', url);
-    if (url != null && url != "")
-    {
+    if (url != null && url != "") {
         ajax(url, txSent, postdata);
     }
     return false;
 }
 
-function txRebuild()
-{
+function txRebuild() {
     var sec = rush.txSec;
     var addr = rush.address;
     var unspent = rush.txUnspent;
     var balance = parseFloat(rush.balance);
     var fee = parseFloat(rush.txFee);
 
-    try
-    {
+    try {
         var res = Bitcoin.base58.checkDecode(sec);
         var version = res.version;
         var payload = res.slice(0);
-    }
-    catch (err)
-    {
+    } catch (err) {
         rush.txJSON = "";
         rush.txHex = "";
 
@@ -190,8 +170,7 @@ function txRebuild()
     }
 
     var compressed = false;
-    if (payload.length > 32)
-    {
+    if (payload.length > 32) {
         payload.pop();
         compressed = true;
     }
@@ -203,53 +182,46 @@ function txRebuild()
 
     var fval = 0;
     var o = txGetOutputs();
-    for (i in o)
-    {
+    for (i in o) {
         TX.addOutput(o[i].dest, o[i].fval);
         fval += o[i].fval;
     }
 
-    bigBalance = btcstr2bignum( balance.toString() );
-    bigFee = btcstr2bignum( fee.toString() );
-    bigfVal = btcstr2bignum( fval.toString() );
+    bigBalance = btcstr2bignum(balance.toString());
+    bigFee = btcstr2bignum(fee.toString());
+    bigfVal = btcstr2bignum(fval.toString());
 
 
     // send change back or it will be sent as fee
     // if (balance > fval + fee)
-    if ((bigBalance/1) > (bigfVal.add(bigFee)/1) )
-    {
-        var bigChange = bigBalance.subtract(bigfVal).subtract(bigFee); 
+    if ((bigBalance / 1) > (bigfVal.add(bigFee) / 1)) {
+        var bigChange = bigBalance.subtract(bigfVal).subtract(bigFee);
         // console.log( "subtracting " + (bigBalance/1) + " - " + (bigfVal/1) + " - " + (bigFee/1) + " = " + (bigChange/1) );
         // var change = balance - fval - fee;
         change = bigChange / 100000000;
         //onsole.log(addr, change)
         TX.addOutput(addr, change);
     }
-    try
-    {
+    try {
         var sendTx = TX.construct();
         var txJSON = TX.toBBE(sendTx);
         var buf = sendTx.serialize();
         var txHex = Bitcoin.convert.bytesToHex(buf);
         rush.txJSON = txJSON;
         rush.txHex = txHex;
-    }
-    catch (err)
-    {
+    } catch (err) {
         rush.txJSON = "";
         rush.txHex = "";
     }
     txSend();
 }
 
-function txOnChangeDest()
-{
+function txOnChangeDest() {
     var balance = parseFloat(rush.balance);
     var fval = parseFloat(rush.txValue);
     var fee = parseFloat(rush.txFee);
 
-    if (fval + fee > balance)
-    {
+    if (fval + fee > balance) {
         fee = balance - fval;
         rush.txFee = fee > 0 ? fee : '0.00';
     }
@@ -284,8 +256,7 @@ function txOnChangeDest()
 //     timeout = setTimeout(txRebuild, TIMEOUT);
 // }
 
-function txGetOutputs()
-{
+function txGetOutputs() {
     var res = [];
     // $.each($(document).find('.txCC'), function() {
     //     var dest = rush.txDest;
@@ -295,8 +266,7 @@ function txGetOutputs()
 
     var dest = rush.txDest;
     var fval = parseFloat(rush.txAmount);
-    res.push(
-    {
+    res.push({
         "dest": dest,
         "fval": fval
     });
@@ -316,8 +286,7 @@ var entroMouse = window.entroMouse = {
     "lockHeight": 0,
     "mouseInside": false,
 
-    "start": function ()
-    {
+    "start": function() {
 
         var ua = navigator.userAgent.toLowerCase();
 
@@ -329,13 +298,11 @@ var entroMouse = window.entroMouse = {
         $(".ripples").hide();
         $("#progressLockBox").css("display", "inline-block");
 
-        if (mobilecheck())
-        {
+        if (mobilecheck()) {
 
             $("#qrInstall").show();
 
-            if( /Android/i.test(navigator.userAgent) ) 
-            {
+            if (/Android/i.test(navigator.userAgent)) {
                 $("#qrInstallIcon a img").attr("src", "img/droid.png");
                 $("#storeName").html("Google Play Store")
                 $("#qrInstallIcon a").attr("href", "https://play.google.com/store/apps/details?id=com.google.zxing.client.android&hl=en");
@@ -356,15 +323,13 @@ var entroMouse = window.entroMouse = {
 
             // });
 
-            document.addEventListener('touchmove', function (e)
-            {
+            document.addEventListener('touchmove', function(e) {
                 // e.preventDefault();
-                if (e.target.className == "tapBox" || e.target.className == "ripple ripple-3")
-                {
+                if (e.target.className == "tapBox" || e.target.className == "ripple ripple-3") {
                     event.preventDefault()
 
                     var x = e.touches[0].pageX,
-                    y = e.touches[0].pageY;
+                        y = e.touches[0].pageY;
                     // $('.tap').remove();
                     // time = new Date().getTime();
 
@@ -377,17 +342,15 @@ var entroMouse = window.entroMouse = {
 
                     // }
 
-                    
+
                     var touch = e.touches[0];
                     entroMouse.mmove(touch);
                 }
             }, false);
-        }
-        else
-        {
+        } else {
             document.onmousemove = this.mmove;
 
-            $("#leadTxt").html( "Move your mouse randomly inside the box until your new Groestlcoin wallet appears" );
+            $("#leadTxt").html("Move your mouse randomly inside the box until your new Groestlcoin wallet appears");
 
 
 
@@ -397,36 +360,33 @@ var entroMouse = window.entroMouse = {
 
     },
 
-    "mmove": function (ns)
-    {
-        if (entroMouse.generating)
-        {
+    "mmove": function(ns) {
+        if (entroMouse.generating) {
 
-            if ( !entroMouse.mouseInside && !mobilecheck() )
-            {
+            if (!entroMouse.mouseInside && !mobilecheck()) {
                 return false;
             }
 
             X = ns.pageX;
             Y = ns.pageY;
 
-            if (ns.target.className == "tapBox" || ns.target.className == "ripple ripple-3")
-            {
+            if (ns.target.className == "tapBox" || ns.target.className == "ripple ripple-3") {
                 time = new Date().getTime();
 
-                if ( time % 5 == 1 )
-                {
+                if (time % 5 == 1) {
                     tapDiv = $('<div>');
 
-                    tapDiv.addClass("tap").css({left: X,top: Y }).appendTo("body").fadeOut(1000);
+                    tapDiv.addClass("tap").css({
+                        left: X,
+                        top: Y
+                    }).appendTo("body").fadeOut(1000);
                     // tapDiv.append( "<div class='tap2'><div class='tap3'></div><div>" );
 
                 }
             }
 
-            $("#progressFill").css(
-            {
-                "height": (entroMouse.lockHeight+=.5 ) + "px"
+            $("#progressFill").css({
+                "height": (entroMouse.lockHeight += .5) + "px"
             });
 
             time = new Date().getTime();
@@ -435,17 +395,15 @@ var entroMouse = window.entroMouse = {
 
             entroMouse.count++;
 
-            if ( entroMouse.count % 10 == 1 )
-            {
-                if (entroMouse.max--)
-                {
+            if (entroMouse.count % 10 == 1) {
+                if (entroMouse.max--) {
                     entroMouse.string += entroMouse.chars.charAt(num % entroMouse.chars.length);
 
                     $("#code").html(entroMouse.string);
 
                     // if ( !mobilecheck() )
                     // {
-                        location.replace("#"+entroMouse.string);
+                    location.replace("#" + entroMouse.string);
                     // }
 
                     percent = ((30 - entroMouse.max) / 30) * 100;
@@ -458,23 +416,19 @@ var entroMouse = window.entroMouse = {
 
                     $("#progress").css("width", percent + "%");
 
-                    $("#progressFill").css(
-                    {
+                    $("#progressFill").css({
                         "height": entroMouse.lockHeight + "px"
                     });
 
                     rush.firstTime = true;
 
 
-                }
-                else
-                {
+                } else {
 
                     entroMouse.generating = false;
 
 
-                    if ( $(".KKCheck").attr("active") == "true" )
-                    {
+                    if ($(".KKCheck").attr("active") == "true") {
                         $("#tapBox, #passwordCheckBox, #passBox").hide();
 
                         $("#createPassword").show();
@@ -482,11 +436,8 @@ var entroMouse = window.entroMouse = {
                         $("#leadTxt").html("Enter a password to encrypt this wallet <span class='glyphicon glyphicon-question-sign' id='passwordInfo'></span>");
 
                         $("#createPasswordTxt").focus();
-                    }
-                    else
-                    {
-                        var bytes = Bitcoin.Crypto.SHA256(entroMouse.string,
-                        {
+                    } else {
+                        var bytes = Bitcoin.Crypto.SHA256(entroMouse.string, {
                             asBytes: true
                         });
 
@@ -516,36 +467,33 @@ var entroMouse = window.entroMouse = {
 }
 
 
-function mobilecheck ()
-{
-// return true;
-    if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) 
+function mobilecheck() {
+    // return true;
+    if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent))
         return true;
     else
         return false;
 }
 
 
-$(document).ready(function ()
-{
+$(document).ready(function() {
 
-    $.fn.redraw = function(){
+    $.fn.redraw = function() {
 
-      $(this).each(function(){
+        $(this).each(function() {
 
-        var redraw = this.offsetHeight;
+            var redraw = this.offsetHeight;
 
-      });
+        });
 
     };
 
 
-    if ( mobilecheck() )
-    {
-        $(".banner").css({position:"absolute"});
-    }
-    else
-    {
+    if (mobilecheck()) {
+        $(".banner").css({
+            position: "absolute"
+        });
+    } else {
         $("#qrscan").parent().parent().hide();
     }
 
@@ -569,63 +517,54 @@ $(document).ready(function ()
     $("#invoicesBody td:nth-child(4) a").tooltip();
 
 
-    $(window).on('beforeunload', function ()
-    {
+    $(window).on('beforeunload', function() {
         return 'Make sure you save your URL in order to access your wallet at a later time.';
     });
 
-    $(document).on("click", '#sendBtn', function (event)
-    {
-        if (!rush.check())
-        {
+    $(document).on("click", '#sendBtn', function(event) {
+        if (!rush.check()) {
             return;
         }
 
         $("#confirmModal").modal("show");
 
-        if ( rush.useFiat )
-        {
+        if (rush.useFiat) {
             var btcValue = parseFloat($("#txtAmount").val()) / rush.price;
-            btcValue = btcFormat( btcValue );
+            btcValue = btcFormat(btcValue);
             txAmount = btcValue;
 
-        }
-        else
-        {
+        } else {
             txAmount = parseFloat($("#txtAmount").val());
-            txAmount = btcFormat( txAmount );
+            txAmount = btcFormat(txAmount);
         }
-        $("#txFee").html( rush.txFee );
-        $("#confirmAmount").html( txAmount );
-        $("#confirmAddress").html( $("#txtAddress").val() );
+        $("#txFee").html(rush.txFee);
+        $("#confirmAmount").html(txAmount);
+        $("#confirmAddress").html($("#txtAddress").val());
 
 
         // rush.send();
-    }); 
+    });
 
-    $(document).on("click", '#confirmSend', function (event)
-    {
+    $(document).on("click", '#confirmSend', function(event) {
         rush.send();
         $("#confirmModal").modal("hide");
 
-    }); 
+    });
 
-    $(document).on("click", '#passwordInfo', function (event)
-    {
+    $(document).on("click", '#passwordInfo', function(event) {
         $("#passwordInfoModal").modal("show");
 
-    }); 
+    });
 
-    $(document).on("click", '#settings', function (event)
-    {
-        if ( !rush.passcode )
+    $(document).on("click", '#settings', function(event) {
+        if (!rush.passcode)
             return;
-        
+
         $("#settingsChoices,#btnNewRequest").show();
 
         $("#settingsTitle .glyphicon, #settingsCurrency, #settingsMining, #settingsExport,#settingsInvoice, #requestForm, #importRequestBox").hide();
 
-        $("#settingsTitleText").html( "Settings" );
+        $("#settingsTitleText").html("Settings");
 
         $("#settingsModal").modal("show");
 
@@ -634,53 +573,46 @@ $(document).ready(function ()
         $("#chartBox").slideUp();
 
 
-        for ( i in rush.currencyOptions )
-        {
-            $("#currencySelect").append( "<option value='" + rush.currencyOptions[i] + "'>" + rush.currencyOptions[i] + "</option>" );
+        for (i in rush.currencyOptions) {
+            $("#currencySelect").append("<option value='" + rush.currencyOptions[i] + "'>" + rush.currencyOptions[i] + "</option>");
         }
 
-        $("#currencySelect").val( rush.currency );
+        $("#currencySelect").val(rush.currency);
 
-    }); 
+    });
 
-    $(document).on("click", '.closeModal, .closeConfirm', function (event)
-    {
+    $(document).on("click", '.closeModal, .closeConfirm', function(event) {
         $("#request, #infoModal, #confirmModal, #passwordInfoModal, #settingsModal").modal("hide");
-    });  
+    });
 
-    $(document).on("change", '#currencySelect', function (event)
-    {
+    $(document).on("change", '#currencySelect', function(event) {
         rush.currency = $(this).val();
         rush.getFiatPrice();
 
-        if ( rush.useFiat )
-        {
-            $(".addonBox").html( rush.getFiatPrefix() );
+        if (rush.useFiat) {
+            $(".addonBox").html(rush.getFiatPrefix());
         }
 
-        if ( rush.useFiat2 )
-        {
-            $(".addonBox2").html( rush.getFiatPrefix() );
+        if (rush.useFiat2) {
+            $(".addonBox2").html(rush.getFiatPrefix());
         }
 
 
         setCookie("currency", rush.currency, 100);
-    });  
+    });
 
-    $(document).on("click", '#qrInstallX', function (event)
-    {
+    $(document).on("click", '#qrInstallX', function(event) {
         $("#qrInstall").slideUp();
-    }); 
+    });
 
-    $(document).on("click", '#generateBtn', function (event)
-    {
+    $(document).on("click", '#generateBtn', function(event) {
 
-        
+
     });
 
     // $(document).on("click", '#passBtn', function (event)
     // {
-        
+
     //     icon = $(this).find(".glyphicon");
 
     //     if ( icon.hasClass("glyphicon-unchecked") )
@@ -693,190 +625,166 @@ $(document).ready(function ()
     //     }
     // });
 
-    $(document).on("click", '#qrscan', function (event)
-    {
+    $(document).on("click", '#qrscan', function(event) {
         $(window).off('beforeunload');
 
 
-    });    
+    });
 
-    $(document).on("click", '#passBoxTxt', function (event)
-    {
-        if ( $(".KKCheck").attr("active") != "true" )
-        {
-            $(".KKCheckInner").addClass("checkGreen");   
-            $("#checkIcon").fadeIn();  
-            $(".KKCheck").attr("active","true");
+    $(document).on("click", '#passBoxTxt', function(event) {
+        if ($(".KKCheck").attr("active") != "true") {
+            $(".KKCheckInner").addClass("checkGreen");
+            $("#checkIcon").fadeIn();
+            $(".KKCheck").attr("active", "true");
 
-        }
-        else
-        {
-            $(".KKCheckInner").removeClass("checkGreen");   
-            $("#checkIcon").fadeOut();  
-            $(".KKCheck").attr("active","false");
+        } else {
+            $(".KKCheckInner").removeClass("checkGreen");
+            $("#checkIcon").fadeOut();
+            $(".KKCheck").attr("active", "false");
         }
     });
 
-    $(document).on("keypress", '#openPasswordTxt', function (e)
-    {
+    $(document).on("keypress", '#openPasswordTxt', function(e) {
         var p = e.keyCode;
-        if (p == 13)
-        {
+        if (p == 13) {
             $("#openWallet").trigger("click");
         }
-    });  
+    });
 
-    $(document).on("keypress", '#createPasswordTxt', function (e)
-    {
+    $(document).on("keypress", '#createPasswordTxt', function(e) {
         var p = e.keyCode;
-        if (p == 13)
-        {
+        if (p == 13) {
             $(this).parent().find("button").trigger("click");
             // $("#openWallet").trigger("click");
         }
-    });   
+    });
 
-    $(document).on("mouseover", '#tapBox', function (e)
-    {
+    $(document).on("mouseover", '#tapBox', function(e) {
         entroMouse.mouseInside = true;
-    }); 
+    });
 
-   $(document).on("click", '#changeType', function (e)
-    {
-        if ( $("#changeType .addonBox").html() != "Ç¤" )
-        {
+    $(document).on("click", '#changeType', function(e) {
+        if ($("#changeType .addonBox").html() != "Ç¤") {
             $("#changeType .addonBox").html("Ç¤");
             rush.useFiat = false;
             rush.amountFiatValue();
-            if ( !mobilecheck() )
+            if (!mobilecheck())
                 $("#txtAmount").focus();
-        }
-        else
-        {
-            $("#changeType .addonBox").html( rush.getFiatPrefix() );
+        } else {
+            $("#changeType .addonBox").html(rush.getFiatPrefix());
             rush.useFiat = true;
             rush.amountFiatValue();
-            if ( !mobilecheck() )
+            if (!mobilecheck())
                 $("#txtAmount").focus();
         }
-    }); 
+    });
 
-    $(document).on("click", '#changeType2', function (e)
-    {
-        if ( $("#changeType2 .addonBox2").html() != "Ç¤" )
-        {
+    $(document).on("click", '#changeType2', function(e) {
+        if ($("#changeType2 .addonBox2").html() != "Ç¤") {
             $("#changeType2 .addonBox2").html("Ç¤");
             rush.useFiat2 = false;
             rush.amountFiatValue2();
-            if ( !mobilecheck() )
+            if (!mobilecheck())
                 $("#txtReceiveAmount").focus();
-        }
-        else
-        {
+        } else {
             $("#changeType2 .addonBox2").html(rush.getFiatPrefix());
             rush.useFiat2 = true;
             rush.amountFiatValue2();
-            if ( !mobilecheck() )
+            if (!mobilecheck())
                 $("#txtReceiveAmount").focus();
         }
     });
 
-    $(document).on("mouseleave", '#tapBox', function (e)
-    {
+    $(document).on("mouseleave", '#tapBox', function(e) {
         entroMouse.mouseInside = false;
     });
-    
 
-    $(document).on("click", '#info', function (e)
-    {
+
+    $(document).on("click", '#info', function(e) {
         $("#infoModal").modal("show");
-    }); 
+    });
 
-    $(document).on("click", '.openInvoice', function (e)
-    {
+    $(document).on("click", '.openInvoice', function(e) {
         num = $(this).attr("invoiceNum");
 
         invoices = localStorage.invoices;
 
-        invoices = JSON.parse( invoices );
+        invoices = JSON.parse(invoices);
 
         invoice = invoices[num];
 
         delete invoice.myAddress;
 
-        urlHash =  btoa( encodeURIComponent( JSON.stringify(invoices[num]) ));
+        urlHash = btoa(encodeURIComponent(JSON.stringify(invoices[num])));
 
-        window.open("http://jswallet.groestlcoin.org/request/#" + urlHash,'_blank');
+        window.open("http://jswallet.groestlcoin.org/request/#" + urlHash, '_blank');
 
-    }); 
+    });
 
-    $(document).on("click", '.deleteInvoice', function (e)
-    {
-        if ( confirm("Are you sure you want to delete this "+ getTypeName( $("#invoiceType").val() ) +"?") )
-        {
+    $(document).on("click", '.deleteInvoice', function(e) {
+        if (confirm("Are you sure you want to delete this " + getTypeName($("#invoiceType").val()) + "?")) {
             num = $(this).attr("invoiceNum");
 
             invoices = localStorage.invoices;
 
-            invoices = JSON.parse( invoices );
+            invoices = JSON.parse(invoices);
 
             type = invoices[num].type;
 
-            invoices.splice( num, 1 );
+            invoices.splice(num, 1);
 
-            localStorage.invoices = JSON.stringify( invoices );
+            localStorage.invoices = JSON.stringify(invoices);
 
-            rush.updateInvoices( type );
+            rush.updateInvoices(type);
         }
 
-     
-    }); 
 
-    $(document).on("click", '.sweepInvoice', function (e)
-    {
-        if ( confirm("Are you sure you want to sweep this "+ getTypeName( $("#invoiceType").val() ) +"?") )
-        {
+    });
+
+    $(document).on("click", '.sweepInvoice', function(e) {
+        if (confirm("Are you sure you want to sweep this " + getTypeName($("#invoiceType").val()) + "?")) {
             num = $(this).attr("invoiceNum");
 
             invoices = localStorage.invoices;
 
-            invoices = JSON.parse( invoices );
+            invoices = JSON.parse(invoices);
 
             invoice = invoices[num];
 
-            rush.sweep( Bitcoin.Crypto.SHA256( rush.passcode + "_" + invoice.invoiceid )  );
+            rush.sweep(Bitcoin.Crypto.SHA256(rush.passcode + "_" + invoice.invoiceid));
         }
 
-     
-    }); 
 
-   
+    });
 
-    $(document).on("click", '.openInvoiceWallet', function (e)
-    {
+
+
+    $(document).on("click", '.openInvoiceWallet', function(e) {
         num = $(this).attr("invoiceNum");
 
         invoices = localStorage.invoices;
 
-        invoices = JSON.parse( invoices );
+        invoices = JSON.parse(invoices);
 
-        urlHash = Bitcoin.Crypto.SHA256(rush.passcode + "_" + invoices[num].invoiceid ) ;
+        urlHash = Bitcoin.Crypto.SHA256(rush.passcode + "_" + invoices[num].invoiceid);
 
-        window.open("http://jswallet.groestlcoin.org/#" + urlHash,'_blank');
+        window.open("http://jswallet.groestlcoin.org/#" + urlHash, '_blank');
 
     });
 
-    $(document).on("click", '#createWallet', function (event)
-    {
+    $(document).on("click", '#createWallet', function(event) {
 
         rush.passcode = $("#createPasswordTxt").val();
 
-        $("#leadTxt").animate({opacity:0},300);
-        setTimeout(function ()
-        {
+        $("#leadTxt").animate({
+            opacity: 0
+        }, 300);
+        setTimeout(function() {
             $("#leadTxt").html("Please re-enter your password to verify")
 
-            $("#leadTxt").animate({opacity:1},300);
+            $("#leadTxt").animate({
+                opacity: 1
+            }, 300);
 
         }, 500);
 
@@ -888,10 +796,8 @@ $(document).ready(function ()
 
     });
 
-    $(document).on("click", '#createWallet2', function (event)
-    {
-        if ( $("#createPasswordTxt").val() !=  rush.passcode )
-        {
+    $(document).on("click", '#createWallet2', function(event) {
+        if ($("#createPasswordTxt").val() != rush.passcode) {
             $("#loginError").slideDown().html("Passwords did not match! Please try again");
             $("#leadTxt").html("Enter a password to secure this wallet");
 
@@ -903,14 +809,13 @@ $(document).ready(function ()
             return false;
         }
 
-        userPassHash =  Bitcoin.Crypto.SHA256( $("#createPasswordTxt").val() );
+        userPassHash = Bitcoin.Crypto.SHA256($("#createPasswordTxt").val());
 
-        var passHash = Bitcoin.Crypto.SHA256(entroMouse.string + "!" + userPassHash );
+        var passHash = Bitcoin.Crypto.SHA256(entroMouse.string + "!" + userPassHash);
 
         var passChk = passHash.substring(0, 10);
 
-        var bytes = Bitcoin.Crypto.SHA256(entroMouse.string + "!" + userPassHash,
-        {
+        var bytes = Bitcoin.Crypto.SHA256(entroMouse.string + "!" + userPassHash, {
             asBytes: true
         });
 
@@ -927,18 +832,16 @@ $(document).ready(function ()
 
     });
 
-    $(document).on("click", '#openWallet', function (event)
-    {
+    $(document).on("click", '#openWallet', function(event) {
 
 
         var code = window.location.hash.substring(1);
 
-        if (code.indexOf("&") > 0)
-        {
+        if (code.indexOf("&") > 0) {
             codeArr = code.split("&");
-            
+
             qrAddress = codeArr[1];
-            
+
             code = codeArr[0];
 
             location.replace("#" + code);
@@ -946,18 +849,16 @@ $(document).ready(function ()
 
         var hashArr = code.split("!");
 
-        userPassHash = Bitcoin.Crypto.SHA256( $("#openPasswordTxt").val() );
+        userPassHash = Bitcoin.Crypto.SHA256($("#openPasswordTxt").val());
 
         var passHash = Bitcoin.Crypto.SHA256(hashArr[0] + "!" + userPassHash);
 
         var passChk = passHash.substring(0, 10);
 
-        if (passChk == hashArr[1])
-        {
+        if (passChk == hashArr[1]) {
 
 
-            var bytes = Bitcoin.Crypto.SHA256(hashArr[0] + "!" + userPassHash,
-            {
+            var bytes = Bitcoin.Crypto.SHA256(hashArr[0] + "!" + userPassHash, {
                 asBytes: true
             });
 
@@ -972,21 +873,18 @@ $(document).ready(function ()
 
             rush.open();
 
-            if ( qrAddress )
-            {
+            if (qrAddress) {
                 $("#sendBox").slideDown();
                 $("#receiveBox").hide();
                 $("#sendBoxBtn").addClass("active");
                 $("#receiveBoxBtn").removeClass("active");
                 $(".tabButton").addClass("tabsOn");
 
-               
+
                 $("#txtAddress").val(qrAddress);
 
             }
-        }
-        else
-        {
+        } else {
             $("#loginError").slideDown().html("Wrong password!");
         }
 
@@ -994,36 +892,26 @@ $(document).ready(function ()
 
     });
 
-    
 
-    $(document).on("keyup", '#createPasswordTxt', function (event)
-    {
-        if ($(this).val().length > 0)
-        {
+
+    $(document).on("keyup", '#createPasswordTxt', function(event) {
+        if ($(this).val().length > 0) {
             $("#createWallet, #createWallet2").removeAttr("disabled");
-        }
-        else
-        {
+        } else {
             $("#createWallet, #createWallet2").attr("disabled", "disabled");
         }
     });
 
-    $(document).on("keyup", '#importRequestID', function (event)
-    {
-        if ($(this).val().length > 0)
-        {
+    $(document).on("keyup", '#importRequestID', function(event) {
+        if ($(this).val().length > 0) {
             $("#importRequestBtn").removeAttr("disabled");
-        }
-        else
-        {
+        } else {
             $("#importRequestBtn").attr("disabled", "disabled");
         }
     });
 
-    $(document).on("click", '#importRequestBtn', function (event)
-    {
-        var bytes = Bitcoin.Crypto.SHA256(Bitcoin.Crypto.SHA256(rush.passcode + "_" + $("#importRequestID").val()) ,
-        {
+    $(document).on("click", '#importRequestBtn', function(event) {
+        var bytes = Bitcoin.Crypto.SHA256(Bitcoin.Crypto.SHA256(rush.passcode + "_" + $("#importRequestID").val()), {
             asBytes: true
         });
 
@@ -1032,57 +920,53 @@ $(document).ready(function ()
 
         type = $("#invoiceType").val();
 
-        invoice = {address:address,"amount":0,title: "Imported " + getTypeName( type ),invoiceid:$("#importRequestID").val(),description:"",myAddress:rush.address, type:type};
-        
+        invoice = {
+            address: address,
+            "amount": 0,
+            title: "Imported " + getTypeName(type),
+            invoiceid: $("#importRequestID").val(),
+            description: "",
+            myAddress: rush.address,
+            type: type
+        };
+
         invoices = localStorage.invoices;
 
-        if ( !invoices )
-        {
-            localStorage.invoices =  JSON.stringify([invoice]);    
-        }
-        else
-        {
-            invoices = JSON.parse( invoices );
-            invoices.push( invoice );
-            localStorage.invoices =  JSON.stringify(invoices);    
+        if (!invoices) {
+            localStorage.invoices = JSON.stringify([invoice]);
+        } else {
+            invoices = JSON.parse(invoices);
+            invoices.push(invoice);
+            localStorage.invoices = JSON.stringify(invoices);
         }
 
         $("#importRequestBox").slideUp();
 
-        if ( type == "SmartFund" )
-        {
+        if (type == "SmartFund") {
             rush.openSmartFundBox();
-        }
-        else
-        {
+        } else {
             rush.openSmartRequestBox();
         }
 
 
     });
 
-    $(document).on("keyup", '#txtReceiveAmount', function (event)
-    {
-        if ($(this).val().length > 0 && $(this).val() > 0 )
-        {
+    $(document).on("keyup", '#txtReceiveAmount', function(event) {
+        if ($(this).val().length > 0 && $(this).val() > 0) {
             $("#generateBtn").removeAttr("disabled");
             rush.amountFiatValue2();
 
-        }
-        else
-        {
+        } else {
             $("#generateBtn").attr("disabled", "disabled");
             $("#fiatPrice2").html("");
 
         }
 
 
-    });  
+    });
 
-    $(document).on("keyup", '#txtFeeAmount', function (event)
-    {
-        if ($(this).val().length > 0 && $(this).val() > 0 && !isNaN( $(this).val() ) )
-        {
+    $(document).on("keyup", '#txtFeeAmount', function(event) {
+        if ($(this).val().length > 0 && $(this).val() > 0 && !isNaN($(this).val())) {
 
             amount = $(this).val();
 
@@ -1094,122 +978,123 @@ $(document).ready(function ()
 
             $("#fiatPriceFee").html("(" + rush.getFiatPrefix() + formatMoney(fiatValue) + ")");
 
-            rush.setTxFee( amount );
+            rush.setTxFee(amount);
 
-        }
-        else
-        {
+        } else {
             $("#fiatPriceFee").html("");
 
         }
 
 
-    });  
+    });
 
 
 
-    $(document).on("keyup", '#txtAmount', function (event)
-    {
+    $(document).on("keyup", '#txtAmount', function(event) {
 
         amount = $(this).val();
 
-        if ( rush.useFiat )
-        {
-            amount = parseFloat( amount ) / rush.price;
-            amount = btcFormat( amount );
+        if (rush.useFiat) {
+            amount = parseFloat(amount) / rush.price;
+            amount = btcFormat(amount);
         }
 
-        if ( $(this).val().length > 0 )
-        {
+        if ($(this).val().length > 0) {
             rush.amountFiatValue();
-            $(this).css({"font-size":"24px"});
-        }
-        else
-        {
+            $(this).css({
+                "font-size": "24px"
+            });
+        } else {
             $("#fiatPrice").html("");
-            $(this).css({"font-size":"14px"});
+            $(this).css({
+                "font-size": "14px"
+            });
 
         }
 
-        if ( $(this).val().length > 0 && parseFloat( amount ) <= rush.balance )
-        {
+        if ($(this).val().length > 0 && parseFloat(amount) <= rush.balance) {
             $("#sendBtn").removeAttr("disabled");
 
-        }
-        else
-        {
+        } else {
             $("#sendBtn").attr("disabled", "disabled").html("Send");
         }
 
-        if ( $("#txtAmount").val().toLowerCase() == "vapor" ) //Easter egg...SHHH!
+        if ($("#txtAmount").val().toLowerCase() == "vapor") //Easter egg...SHHH!
         {
             playBeep();
             $("#btcBalance").html("0.00000000");
             $("#fiatValue").html("$0.00");
-            $("#txtAmount").val("").css({"font-size":"14px"});
+            $("#txtAmount").val("").css({
+                "font-size": "14px"
+            });
 
             setMsg("Payment sent!", true);
         }
 
-        if ( $("#txtAmount").val().toLowerCase() == "ballin" ) //Easter egg...SHHH!
+        if ($("#txtAmount").val().toLowerCase() == "ballin") //Easter egg...SHHH!
         {
             playBeep();
             $("#btcBalance").html("9,237.82039284");
             cash = 9237.82039284 * rush.price;
             cash = cash.toFixed(2);
             $("#fiatValue").html(rush.getFiatPrefix() + formatMoney(cash));
-            $("#txtAmount").val("").css({"font-size":"14px"});
+            $("#txtAmount").val("").css({
+                "font-size": "14px"
+            });
 
         }
 
-        if ( $("#txtAmount").val().toLowerCase() == "baron" ) //Easter egg...SHHH!
+        if ($("#txtAmount").val().toLowerCase() == "baron") //Easter egg...SHHH!
         {
             playBeep();
 
-            setTimeout( function()
-            {
+            setTimeout(function() {
                 playBaron();
                 $("#btcBalance").html("9,237.82039284");
                 cash = 9237.82039284 * rush.price;
                 cash = cash.toFixed(2);
                 $("#fiatValue").html(rush.getFiatPrefix() + formatMoney(cash));
-                $("#txtAmount").val("").css({"font-size":"14px"});
+                $("#txtAmount").val("").css({
+                    "font-size": "14px"
+                });
             }, 500);
 
-            ga( "send", "event", "Baron", "Easter" );
+            ga("send", "event", "Baron", "Easter");
 
 
-           
 
-        } 
 
-        if ( $("#txtAmount").val().toLowerCase() == "tdfw" ) 
-        {
+        }
 
-      
+        if ($("#txtAmount").val().toLowerCase() == "tdfw") {
+
+
             playTurn();
-            
-            $("#txtAmount").val("").css({"font-size":"14px"});
-    
 
-            ga( "send", "event", "TurnDown", "Easter" );
+            $("#txtAmount").val("").css({
+                "font-size": "14px"
+            });
 
-        } 
 
-        if ( $("#txtAmount").val().toLowerCase() == "stop" ) //Easter egg...SHHH!
+            ga("send", "event", "TurnDown", "Easter");
+
+        }
+
+        if ($("#txtAmount").val().toLowerCase() == "stop") //Easter egg...SHHH!
         {
             rush.snd.pause();
-            $("#txtAmount").val("").css({"font-size":"14px"});
+            $("#txtAmount").val("").css({
+                "font-size": "14px"
+            });
 
         }
 
 
-        if ( $("#txtAmount").val().toLowerCase() == "max" || $("#txtAmount").val().toLowerCase() == "all" )
-        {
-            bigBalance = btcstr2bignum( rush.balance.toString() );
-            bigFee = btcstr2bignum( rush.txFee.toString() );
+        if ($("#txtAmount").val().toLowerCase() == "max" || $("#txtAmount").val().toLowerCase() == "all") {
+            bigBalance = btcstr2bignum(rush.balance.toString());
+            bigFee = btcstr2bignum(rush.txFee.toString());
 
-            bigAmount = bigBalance.subtract( bigFee );
+            bigAmount = bigBalance.subtract(bigFee);
 
             // amount = rush.balance - rush.txFee;
             // amount = btcFormat( amount );
@@ -1218,119 +1103,102 @@ $(document).ready(function ()
 
             amount = amount.toFixed(8);
 
-            if ( amount <= 0 )
-            {
+            if (amount <= 0) {
                 amount = 0;
-            }
-            else
-            {
+            } else {
                 $("#sendBtn").removeAttr("disabled");
             }
 
-            $("#txtAmount").val( amount );
+            $("#txtAmount").val(amount);
             rush.amountFiatValue();
 
 
         }
-    }); 
-
-    $(document).on("focus", '#txtAddress', function (event)
-    {
-        $(this).css({"background-color":"#FFFFFF", color:"#555555"});
-        $("#oneNameInfo").hide();
-
-    }); 
-
-    $(document).on("click", '.qr-link img', function (event)
-    {
-        $(".smallQR").switchClass("smallQR", "bigQR",1);
-        $(".bigQR").switchClass("bigQR", "smallQR",1);
     });
 
-    $(document).on("click", '#btnNewRequest', function (event)
-    {
+    $(document).on("focus", '#txtAddress', function(event) {
+        $(this).css({
+            "background-color": "#FFFFFF",
+            color: "#555555"
+        });
+        $("#oneNameInfo").hide();
+
+    });
+
+    $(document).on("click", '.qr-link img', function(event) {
+        $(".smallQR").switchClass("smallQR", "bigQR", 1);
+        $(".bigQR").switchClass("bigQR", "smallQR", 1);
+    });
+
+    $(document).on("click", '#btnNewRequest', function(event) {
         $("#requestForm").slideDown();
         $(this).hide();
     });
 
-    $(document).on("blur", '#txtAddress', function (event)
-    {
-        if ( $(this).val().length > 0 && !rush.checkAddress( $(this).val() ) )
-        {
+    $(document).on("blur", '#txtAddress', function(event) {
+        if ($(this).val().length > 0 && !rush.checkAddress($(this).val())) {
 
             $("#oneNameName").html("Loading...");
             $("#oneNameImg").html("");
             $("#oneNameInfo").show();
 
-            $.ajax(
-            {
+            $.ajax({
                 type: "GET",
                 url: "http://jswallet.groestlcoin.org/lookup.php?id=" + $("#txtAddress").val(),
                 async: true,
                 dataType: "json",
-                data:
-                {}
+                data: {}
 
-            }).done(function (msg)
-            {
-                if ( msg.hasOwnProperty( "bitcoin" ) )
-                {
-                    $("#txtAddress").val(msg.bitcoin.address).css({color:"#4CAE4C"});
-                    
+            }).done(function(msg) {
+                if (msg.hasOwnProperty("bitcoin")) {
+                    $("#txtAddress").val(msg.bitcoin.address).css({
+                        color: "#4CAE4C"
+                    });
 
-                    if ( msg.hasOwnProperty("name") )
-                    {
-                        $("#oneNameName").html( htmlEncode( msg.name.formatted ) );
+
+                    if (msg.hasOwnProperty("name")) {
+                        $("#oneNameName").html(htmlEncode(msg.name.formatted));
                     }
 
-                    if ( msg.hasOwnProperty("avatar") )
-                    {
+                    if (msg.hasOwnProperty("avatar")) {
                         $("#oneNameImg").html("<img src=\"" + encodeURI(msg.avatar.url) + "\">");
-                    }
-                    else
-                    {
+                    } else {
                         $("#oneNameImg").html("");
                     }
 
-                    if ( mobilecheck() )
-                    {
-                        $("#oneNameInfo").css({"right":"55px"});
+                    if (mobilecheck()) {
+                        $("#oneNameInfo").css({
+                            "right": "55px"
+                        });
                     }
 
 
                     $("#oneNameInfo").show();
                     //$("#txtAddress").val(msg.bitcoin.address).css({"background-color":"#52B3EA"});
-                }
-                else
-                {
+                } else {
                     // $("#txtAddress").css({"background-color":"#DA9999"});
                     $("#oneNameInfo").hide();
 
                 }
 
-               
-                
+
+
             });
         }
-    }); 
-
-  
+    });
 
 
-    $(document).on("keyup", '#openPasswordTxt', function (event)
-    {
-        if ($(this).val().length > 0)
-        {
+
+
+    $(document).on("keyup", '#openPasswordTxt', function(event) {
+        if ($(this).val().length > 0) {
             $("#openWallet").removeAttr("disabled");
-        }
-        else
-        {
+        } else {
             $("#openWallet").attr("disabled", "disabled");
         }
     });
 
-    function closeTabs()
-    {
+    function closeTabs() {
         $("#sendBox").slideUp();
         $("#receiveBox").slideUp();
         $("#sendBoxBtn").removeClass("active");
@@ -1338,151 +1206,123 @@ $(document).ready(function ()
         $(".tabButton").removeClass("tabsOn");
     }
 
-    $(document).on("click", '#receiveBoxBtn', function (event)
-    {
-        if ( $(this).hasClass("active") )
-        {
+    $(document).on("click", '#receiveBoxBtn', function(event) {
+        if ($(this).hasClass("active")) {
             closeTabs();
-        }
-        else
-        {
+        } else {
             $("#receiveBox").slideDown();
             $("#sendBox").hide();
-            $("#receiveBoxBtn").toggleClass("active", 250 );
+            $("#receiveBoxBtn").toggleClass("active", 250);
             $("#sendBoxBtn").removeClass("active");
             $(".tabButton").addClass("tabsOn");
 
-            if ( !mobilecheck() )
-            {
-                $("#txtReceiveAmount").focus();                
+            if (!mobilecheck()) {
+                $("#txtReceiveAmount").focus();
             }
         }
 
-        
+
     });
 
-    $(document).on("click", '#sendBoxBtn', function (event)
-    {
+    $(document).on("click", '#sendBoxBtn', function(event) {
 
-        if ( $(this).hasClass("active") )
-        {
+        if ($(this).hasClass("active")) {
             closeTabs();
-        }
-        else
-        {
+        } else {
             $("#sendBox").slideDown();
             $("#receiveBox").hide();
-            $("#sendBoxBtn").toggleClass("active", 250 );
+            $("#sendBoxBtn").toggleClass("active", 250);
             $("#receiveBoxBtn").removeClass("active");
             $(".tabButton").addClass("tabsOn");
 
-            if ( !mobilecheck() )
-            {
-                $("#txtAddress").focus();                
+            if (!mobilecheck()) {
+                $("#txtAddress").focus();
             }
         }
 
     });
 
-    $(document).on("click", '#generateBtn', function (event)
-    {
+    $(document).on("click", '#generateBtn', function(event) {
         rush.generate();
-    }); 
+    });
 
-    $(document).on("keyup", '#requestForm input', function (event)
-    {
-        if ( rush.checkInvoice() )
-        {
+    $(document).on("keyup", '#requestForm input', function(event) {
+        if (rush.checkInvoice()) {
             $("#btnCreateInvoice").removeAttr("disabled");
+        } else {
+            $("#btnCreateInvoice").attr("disabled", "disabled");
         }
-        else
-        {
-            $("#btnCreateInvoice").attr("disabled","disabled");
-        }
-    }); 
+    });
 
-    $(document).on("click", '#requestHelp', function (event)
-    {
+    $(document).on("click", '#requestHelp', function(event) {
         $("#requestHelpText").slideToggle();
-    }); 
+    });
 
-    $(document).on("click", '#settingsTitle', function (event)
-    {
+    $(document).on("click", '#settingsTitle', function(event) {
         $("#settingsChoices,#btnNewRequest").show();
 
         $("#settingsTitle .glyphicon, #settingsCurrency, #settingsMining, #settingsExport, #settingsInvoice, #requestForm, #importRequestBox").hide();
 
-        $("#settingsTitleText").html( "Settings" );
+        $("#settingsTitleText").html("Settings");
     });
 
-    $(document).on("click", '#choiceCurrency', function (event)
-    {
+    $(document).on("click", '#choiceCurrency', function(event) {
         $("#settingsTitle .glyphicon, #settingsCurrency").show();
         $("#settingsChoices").hide();
-        $("#settingsTitleText").html( "Set Currency" );
+        $("#settingsTitleText").html("Set Currency");
     });
 
-    $(document).on("click", '#choiceSmartRequest', function (event)
-    {
+    $(document).on("click", '#choiceSmartRequest', function(event) {
         rush.openSmartRequestBox();
     });
 
-    $(document).on("click", '#choiceSmartFund', function (event)
-    {
+    $(document).on("click", '#choiceSmartFund', function(event) {
         rush.openSmartFundBox();
     });
 
-    $(document).on("click", '.importRequest', function (event)
-    {
+    $(document).on("click", '.importRequest', function(event) {
         rush.openImportRequest();
     });
-    
-    $(document).on("click", '#cancelBtn', function (event)
-    {
+
+    $(document).on("click", '#cancelBtn', function(event) {
         $("#btnNewRequest").show();
         $("#requestForm").slideUp();
-        rush.updateInvoices( $("#invoiceType").val() );
-    }); 
+        rush.updateInvoices($("#invoiceType").val());
+    });
 
-    $(document).on("click", '#getStarted', function (event)
-    {
+    $(document).on("click", '#getStarted', function(event) {
         $("#noInvoice").slideUp();
         $("#requestForm").slideDown();
     });
 
-    $(document).on("click", '#invoiceLinkReceive', function (event)
-    {
+    $(document).on("click", '#invoiceLinkReceive', function(event) {
         $("#request").modal("hide");
         $("#settingsModal").modal("show");
         rush.openInvoiceBox();
-        $("#txtInvoiceAmount").val( $("#txtReceiveAmount").val() );
+        $("#txtInvoiceAmount").val($("#txtReceiveAmount").val());
 
         $("#btnNewRequest").trigger("click");
     });
 
-    
-    $("#price").hover( function ()
-    {
+
+    $("#price").hover(function() {
         //$("#chartBox").stop(true);
         //rush.get24Chart();
 
-    }, function ()
-    {
+    }, function() {
         //$("#chartBox").stop(true);
         //$("#chartBox").slideUp();
     });
 
 
 
-    $(document).on("click", '#choiceExport', function (event)
-    {
+    $(document).on("click", '#choiceExport', function(event) {
 
         $("#settingsTitle .glyphicon, #settingsExport").show();
         $("#settingsChoices").hide();
-        $("#settingsTitleText").html( "Export Private Keys" );
+        $("#settingsTitleText").html("Export Private Keys");
 
-        var bytes = Bitcoin.Crypto.SHA256(rush.passcode,
-        {
+        var bytes = Bitcoin.Crypto.SHA256(rush.passcode, {
             asBytes: true
         });
 
@@ -1490,29 +1330,27 @@ $(document).ready(function ()
 
         privateKey = btcKey.export("base58");
 
-        $("#txtBrain").val( rush.passcode );
-        $("#txtPrivate").val( privateKey );
+        $("#txtBrain").val(rush.passcode);
+        $("#txtPrivate").val(privateKey);
     });
 
-    $(document).on("click", '#choiceMining', function (event)
-    {
+    $(document).on("click", '#choiceMining', function(event) {
         var fiatValue = rush.price * rush.txFee;
 
         fiatValue = fiatValue.toFixed(2);
 
         $("#fiatPriceFee").html("(" + rush.getFiatPrefix() + formatMoney(fiatValue) + ")");
 
-        $("#txtFeeAmount").val( rush.txFee );
+        $("#txtFeeAmount").val(rush.txFee);
 
         $("#settingsTitle .glyphicon, #settingsMining").show();
         $("#settingsChoices").hide();
-        $("#settingsTitleText").html( "Set Mining Fee" );
+        $("#settingsTitleText").html("Set Mining Fee");
 
         $(".settingsOption").removeClass("optionActive");
 
 
-        switch ( parseFloat( rush.txFee ) )
-        {
+        switch (parseFloat(rush.txFee)) {
             case 0:
                 $(".settingsOption[type='frugal']").addClass("optionActive");
                 break;
@@ -1531,28 +1369,26 @@ $(document).ready(function ()
 
     });
 
-    $(document).on("click", '.miningOptionLeft', function (event)
-    {
+    $(document).on("click", '.miningOptionLeft', function(event) {
         $(".settingsOption").removeClass("optionActive");
         $(this).find(".settingsOption").addClass("optionActive", 300);
 
         $("#feeHolder").hide();
 
-        switch ( $(this).find(".settingsOption").attr("type") )
-        {
+        switch ($(this).find(".settingsOption").attr("type")) {
             case "frugal":
-                rush.setTxFee( 0 );
+                rush.setTxFee(0);
                 break;
             case "normal":
-                rush.setTxFee( 0.0001 );
+                rush.setTxFee(0.0001);
                 break;
             case "generous":
-                rush.setTxFee( 0.0005 );
+                rush.setTxFee(0.0005);
                 break;
             case "custom":
                 $("#feeHolder").show();
                 break;
-            
+
             default:
                 $(".settingsOption[type='custom']").addClass("optionActive", 300);
                 break;
@@ -1561,8 +1397,7 @@ $(document).ready(function ()
 
     });
 
-    $(document).on("click", '#btnCreateInvoice', function (event)
-    {
+    $(document).on("click", '#btnCreateInvoice', function(event) {
         rush.createInvoice();
     });
 
@@ -1570,31 +1405,29 @@ $(document).ready(function ()
 
     qrLogin = false;
 
-    if (code.indexOf("&") > 0)
-    {
+    if (code.indexOf("&") > 0) {
         qrLogin = true;
 
         codeArr = code.split("&");
-        
+
         qrAddress = codeArr[1];
-        
+
         code = codeArr[0];
 
         rush.passcode = code;
 
         urlArr = code.split("!");
 
-        userPassHash =  urlArr[1];
+        userPassHash = urlArr[1];
 
-        passHash = Bitcoin.Crypto.SHA256(urlArr[0] + "!" + userPassHash );
+        passHash = Bitcoin.Crypto.SHA256(urlArr[0] + "!" + userPassHash);
 
         var passChk = passHash.substring(0, 10);
 
 
         location.replace("#" + urlArr[0] + "!" + passChk);
 
-        if ( qrAddress )
-        {
+        if (qrAddress) {
             $("#sendBox").slideDown();
             $("#receiveBox").hide();
             $("#sendBoxBtn").addClass("active");
@@ -1603,8 +1436,7 @@ $(document).ready(function ()
 
             qrAddress = decodeURIComponent(qrAddress);
 
-            if ( qrAddress.indexOf(":") > 0 )
-            {
+            if (qrAddress.indexOf(":") > 0) {
                 address = qrAddress.match(/[F3][a-zA-Z0-9]{26,33}/g);
                 address = address[0];
 
@@ -1612,14 +1444,12 @@ $(document).ready(function ()
 
                 qrAddress = address;
 
-                if ( uriAmount != null )
-                {
+                if (uriAmount != null) {
                     uriAmount = uriAmount[0].replace("=", "");
                 }
 
-                if ( uriAmount )
-                {
-                    $("#txtAmount").val( uriAmount );
+                if (uriAmount) {
+                    $("#txtAmount").val(uriAmount);
                 }
             }
 
@@ -1628,37 +1458,29 @@ $(document).ready(function ()
         }
     }
 
-    if (code.length > 9)
-    {
-        if (code.indexOf("!") > 0 && !qrLogin)
-        {
+    if (code.length > 9) {
+        if (code.indexOf("!") > 0 && !qrLogin) {
             $(".progress, #tapBox, #passwordCheckBox, #passBox").hide();
 
             $("#generate").show();
 
             $("#openPassword").slideDown();
 
-            if ( !mobilecheck() )
-            {
-                setTimeout( function ()
-                {
+            if (!mobilecheck()) {
+                setTimeout(function() {
                     $("#openPasswordTxt").focus();
                 }, 500);
             }
-       
+
 
             $("#leadTxt").html("Please enter password to open this wallet");
 
-        }
-        else
-        {
-            if ( qrLogin )
-            {
+        } else {
+            if (qrLogin) {
                 code = rush.passcode;
             }
 
-            var bytes = Bitcoin.Crypto.SHA256(code,
-            {
+            var bytes = Bitcoin.Crypto.SHA256(code, {
                 asBytes: true
             });
 
@@ -1674,9 +1496,7 @@ $(document).ready(function ()
 
 
 
-    }
-    else
-    {
+    } else {
         entroMouse.start();
 
         $("#generate").show();
@@ -1684,8 +1504,7 @@ $(document).ready(function ()
 
 });
 
-function btcFormat (amount)
-{
+function btcFormat(amount) {
     // amount = parseFloat( amount );
     // amount = Math.floor(amount * 100000000) / 100000000
 
@@ -1698,27 +1517,23 @@ function btcFormat (amount)
     return amount.toFixed(8);
 }
 
-function htmlEncode(value){
-  return $('<div/>').text(value).html();
+function htmlEncode(value) {
+    return $('<div/>').text(value).html();
 }
 
-function htmlDecode(value){
-  return $('<div/>').html(value).text();
+function htmlDecode(value) {
+    return $('<div/>').html(value).text();
 }
 
-function getTypeName ( type )
-{
-    if ( type == "SmartRequest" )
-    {
+function getTypeName(type) {
+    if (type == "SmartRequest") {
         return "Payment Request";
-    }
-    else
-    {
+    } else {
         return "Fundraiser";
     }
 }
 
 function getVideoID(url) {
-  var p = /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
-  return (url.match(p)) ? RegExp.$1 : false;
+    var p = /^(?:https?:\/\/)?(?:www\.)?(?:youtu\.be\/|youtube\.com\/(?:embed\/|v\/|watch\?v=|watch\?.+&v=))((\w|-){11})(?:\S+)?$/;
+    return (url.match(p)) ? RegExp.$1 : false;
 }
