@@ -307,8 +307,7 @@ function Groestlwallet() {
 
 		        	for(var i in btcpriceList) {
 		        		btcpriceList[i].last = btcpriceList[i].last * price;
-					delete btcpriceList[i].averages;
-		        		delete btcpriceList[i].timestamp;
+		        		delete btcpriceList[i].symbol;
 		        	}
 
 		        	self.btcpriceList = btcpriceList;

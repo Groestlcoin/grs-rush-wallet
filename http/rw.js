@@ -21,7 +21,7 @@ rush = window.rush = {
     "useFiat2": false,
     "firstTime":false,
     "currency": "USD",
-    "currencyOptions": ["AUD","BRL","CAD","CHF","CNY","DKK","EUR","GBP","HKD","INR", "ISK", "JPY","KRW","NZD","PLN","RUB","SEK","SGD","THB","TWD","USD","ZAR"],
+    "currencyOptions": ["ARS","AUD","BRL","CAD","CHF","CLP","CNY","CZK","DKK","EUR","GBP","HKD","HRK","HUF","INR","ISK","JPY","KRW","NZD","PLN","RON","RUB","SEK","SGD","THB","TRY","TWD","USD"],
     "sweeping":"",
     "getBalanceBlock": false,
     "chartLoaded": false,
@@ -115,10 +115,10 @@ rush = window.rush = {
                 self.dispatch(message, function(){
                     //console.log("subscribed...")
                 })
-            })    
+            })
             self.socket.on('error', function() { })
             self.socket.on('disconnect', function() { })
-            self.socket.on('message', function(args) {                     
+            self.socket.on('message', function(args) {
 
                 if(args.op == "balance") {
                     rush.getBalance();
@@ -130,8 +130,8 @@ rush = window.rush = {
             self.dispatch = function(msg, callback) {
               return self.socket.emit('message', msg, callback);
             }
-            
-        } 
+
+        }
 
         new rushWalletPublicSocket( );
 
@@ -154,16 +154,16 @@ rush = window.rush = {
 
             ga( "send", "event", "Create", "Wallet" );
 
-        }        
+        }
         else
         {
             ga( "send", "event", "Open", "Wallet" );
 
         }
-    
+
 
         // this.getHistory();
-        
+
         // if ( rush.lastTab == "gpg" )
         // {
         //     setTimeout(function ()
@@ -180,7 +180,7 @@ rush = window.rush = {
 
     },
 
-   
+
     "check": function ()
     {
 
@@ -190,7 +190,7 @@ rush = window.rush = {
         }
         else
         {
-            var amount = $("#txtAmount").val();   
+            var amount = $("#txtAmount").val();
         }
 
         if (amount > this.balance)
@@ -198,7 +198,7 @@ rush = window.rush = {
             setMsg("You are trying to send more GRS than you have in your balance!");
             return false;
         }
-        
+
         // console.log( "total: " + (parseFloat(amount) + parseFloat(this.txFee)) + " balance: " + this.balance);
 
         total = parseFloat(amount) + parseFloat(this.txFee);
@@ -281,7 +281,7 @@ rush = window.rush = {
         var btcKey = new Bitcoin.Key(bytes);
 
         this.txSec = btcKey.export("base58");
-        
+
         if ( this.useFiat )
         {
             var btcValue = parseFloat($("#txtAmount").val()) / this.price;
@@ -356,7 +356,7 @@ rush = window.rush = {
                 rush.sweeping="";
             }
 
-            
+
 
         });
     },
@@ -437,9 +437,9 @@ rush = window.rush = {
 
         }, 1000);
 
-       
 
-        
+
+
     },
     "checkInvoice": function ()
     {
@@ -491,7 +491,7 @@ rush = window.rush = {
         title = $("#txtInvoiceTitle").val();
 
         type = $("#invoiceType").val();
-       
+
         video = $("#txtYoutube").val();
 
         invoice = {address:address,"amount":amount,title:title,invoiceid:$("#txtInvoiceID").val(),description:$("#txtInvoiceDescription").val(),myAddress:rush.address, type:type, video:video};
@@ -500,13 +500,13 @@ rush = window.rush = {
 
         if ( !invoices )
         {
-            localStorage.invoices =  JSON.stringify([invoice]);    
+            localStorage.invoices =  JSON.stringify([invoice]);
         }
         else
         {
             invoices = JSON.parse( invoices );
             invoices.push( invoice );
-            localStorage.invoices =  JSON.stringify(invoices);    
+            localStorage.invoices =  JSON.stringify(invoices);
         }
 
         $("#txtInvoiceTitle, #txtInvoiceAmount, #txtInvoiceDescription").val("");
@@ -581,7 +581,7 @@ rush = window.rush = {
                 }
             }
         }
-        
+
         $("#invoiceCount").html(myInvoiceCount);
 
         $(".invoiceType").html( getTypeName( type ) );
@@ -662,7 +662,7 @@ rush = window.rush = {
                 $("#txTable tbody").append( '<tr><td>' + txTime + '</td><td class="hidden-sm hidden-xs"><a href="https://chainz.cryptoid.info/grs/tx.dws?' + msg.txs[i].hash + '.htm" target="_blank" >' + msg.txs[i].hash.substring(0,30) + '...</a></td><td class="hidden-sm hidden-xs">' +  formatMoney( msg.txs[i].confirmations || 0 ) + '</td><td>' + btcFormat( msg.txs[i].change/1e8 ) + '</td></tr>' );
             }
 
-            $("#txTable tbody tr td:nth-child(4)").each( function ( i ) 
+            $("#txTable tbody tr td:nth-child(4)").each( function ( i )
             {
                 if ( $(this).html() > 0 )
                 {
@@ -681,7 +681,7 @@ rush = window.rush = {
             rush.getUnconfirmed();
         });
 
-    },  
+    },
     "setTxFee": function ( fee )
     {
         this.txFee = parseFloat( fee );
@@ -734,7 +734,7 @@ rush = window.rush = {
                 $("#txBox").show();
                 $("#noTx, #txList .break").hide();
             }
-        
+
 
             for ( i in unconfirmedArr )
             {
@@ -746,7 +746,7 @@ rush = window.rush = {
 
             $("#txTable tbody").prepend( unconfirmed );
 
-            $("#txTable tbody tr td:nth-child(4)").each( function ( i ) 
+            $("#txTable tbody tr td:nth-child(4)").each( function ( i )
             {
                if ( $(this).html() > 0 )
                {
@@ -765,7 +765,7 @@ rush = window.rush = {
         });
 
     },
-    "get24Chart": function() 
+    "get24Chart": function()
     {
         if ( this.chartLoaded )
         {
@@ -778,7 +778,7 @@ rush = window.rush = {
            url: "https://api.bitcoinaverage.com/history/" + rush.currency + "/per_minute_24h_sliding_window.csv",
            dataType: "text",
            cache : false,
-           success: function(allText) 
+           success: function(allText)
             {
                 rush.chartLoaded = true;
 
@@ -812,14 +812,14 @@ rush = window.rush = {
 
                         hours.push( [unix, lines[i][1] ] );
                     }
-                    
+
 
                 }
 
                 $("#chartBox").slideDown();
 
                 $.plot("#chart24", [ hours ],
-                    {       
+                    {
                            xaxis: {mode:"time", timeformat: "%H", timezone: "browser", tickSize: [3, "hour"]},
                            colors: ["#F49500"],
                            grid: {
@@ -886,27 +886,27 @@ rush = window.rush = {
                 return "$";
                 break;
             case "BRL":
-                return "R$"; 
+                return "R$";
             case "CNY":
-                return "Â¥";            
+                return "Â¥";
             case "DKK":
                 return "kr";
             case "EUR":
-                return "â‚¬";            
+                return "â‚¬";
             case "GBP":
-                return "Â£";            
+                return "Â£";
             case "INR":
                 return "";
             case "ISK":
-                return "kr";            
+                return "kr";
             case "JPY":
                 return "Â¥";
             case "KRW":
-                return "â‚©";            
+                return "â‚©";
             case "PLN":
                 return "zÅ‚";
             case "RUB":
-                return "Ñ€ÑƒÐ± ";            
+                return "Ñ€ÑƒÐ± ";
             case "SEK":
                 return "kr ";
             case "TWD":
@@ -939,7 +939,7 @@ rush = window.rush = {
             dataType: "json"
 
         }).done(function (msg) {
-            
+
 
             price = msg[currency].last;
 
@@ -971,7 +971,7 @@ rush = window.rush = {
             amount = 0;
         }
 
-        
+
         if ( rush.useFiat )
         {
             var btcValue = amount / this.price;
@@ -1001,7 +1001,7 @@ rush = window.rush = {
             amount = 0;
         }
 
-        
+
         if ( rush.useFiat2 )
         {
             var btcValue = amount / this.price;
@@ -1045,10 +1045,10 @@ rush = window.rush = {
         entroMouse.start();
 
     },
-    
+
     "txComplete": function ()
     {
-  
+
         ga( "send", "event", "Send", "Wallet" );
 
         setMsg("Payment sent!", true);
@@ -1058,7 +1058,7 @@ rush = window.rush = {
         $("#sendBtn").html("Send");
 
         this.txSec = "";
-        
+
         if ( rush.sweeping != "" )
         {
             rush.address = rush.sweeping;
@@ -1165,8 +1165,8 @@ rush = window.rush = {
 
 
     }
-    
-   
+
+
 
 
 };
